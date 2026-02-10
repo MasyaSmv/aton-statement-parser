@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<?xml-stylesheet type="text/xsl" href="http://esign.aton-line.ru/templates/GetTemplateFile.aspx?file=repClientResidentPeriodXsl.45"?>
+<BIS:BISPeriod xmlns:BIS="http://www.aton.ru/templates/repClientResidentPeriodXsd.45">
+    <BIS:Trades>
+        <BIS:Row BIS:OperID="567890123"
+                 BIS:isComplete="0"
+                 BIS:OperDate="02.10.24"
+                 BIS:OperDateSort="25.12.2024 0:00:00"
+                 BIS:Quantity="2.00000000"
+                 BIS:Price="4099"
+                 BIS:Payment="-8198.000000"
+                 BIS:TradeType="Покупка"/>
+    </BIS:Trades>
+
+    <BIS:MoneyInOut>
+        <BIS:Row BIS:OperID="456789012"
+                 BIS:Quantity="-1062.00000000"
+                 BIS:OperDate="16.11.18"
+                 BIS:OperTimeSort="01.01.1900 16:40:30"
+                 BIS:Currency="RUR"/>
+    </BIS:MoneyInOut>
+</BIS:BISPeriod>

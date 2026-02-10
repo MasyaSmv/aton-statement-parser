@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<?xml-stylesheet type="text/xsl" href="http://esign.aton-line.ru/templates/GetTemplateFile.aspx?file=repClientResidentPeriodXsl.45"?>
+<BIS:BISPeriod xmlns:BIS="http://www.aton.ru/templates/repClientResidentPeriodXsd.45">
+    <BIS:CommonData>
+        <BIS:Row BIS:CPID="11111111" BIS:BegDate="29.12.2023" BIS:EndDate="25.12.2024" BIS:MakeDate="26.12.2024" BIS:SBSType="2" BIS:WithSubAccounts="0" BIS:ContractNum="22222222" BIS:ContractDate="30.08.2024" BIS:IsFilial="1" BIS:DirectorShortName="Тест Т. С." BIS:ChiefOfficeShortName="Тест Т. С." BIS:CompanyName="ООО &quot;АТОН&quot;" BIS:LogoURL="http://www.aton-line.ru/images4reports/logo.gif" BIS:URLToReport="https://www.aton.ru/cc/inbox/byrequest/11111111/2023-12-29/2024-12-25" />
+    </BIS:CommonData>
+
+    <BIS:ClientMoneyConvert>
+        <BIS:Row BIS:OperID="234567890" BIS:IntOperNum="fx234567 / 15.11.2018" BIS:OperDate="15.11.2018" BIS:Curr1="RUR" BIS:Sum1="68900.00" BIS:Sum1_RUR="68900.00" BIS:Date1="16.11.2018" BIS:Rate="66.6402" BIS:Curr2="USD" BIS:Sum2="1033.91" BIS:Sum2_RUR="68874.85" BIS:Date2="16.11.2018" BIS:Portfolio="11111111" BIS:OperTime="01.01.1900 16:40:30" BIS:OperDateSort="15.11.2018 0:00:00" BIS:Section="ClientMoneyConvert" BIS:ComSum="0" />
+    </BIS:ClientMoneyConvert>
+
+    <BIS:MoneyInOut>
+        <BIS:Row BIS:OperID="456789012" BIS:OperType="Brok" BIS:OperTypeSort="30" BIS:OperDate="16.11.18" BIS:PaymentDate="16.11.18" BIS:Quantity="-1062.00000000" BIS:Comment="Комиссия (тест)" BIS:Portfolio="11111111" BIS:OperDateSort="16.11.2018 0:00:00" BIS:OperTimeSort="01.01.1900 16:40:30" BIS:Currency="RUR" BIS:SettlementDate="16.11.18" BIS:IsIBStock="0" />
+    </BIS:MoneyInOut>
+
+    <BIS:Trades>
+        <BIS:Row BIS:OperID="567890123" BIS:isComplete="0" BIS:OperPlace="ПАО Московская Биржа, Фондовый рынок" BIS:IntOperNum="567890123, 25.12.24, 15:51:56, mcxs567890123" BIS:TradeType="Покупка" BIS:AssetName="Тестовая бумага" BIS:Quantity="2.00000000" BIS:Price="4099" BIS:PriceCurr="RUR" BIS:PaymentCurr="RUR" BIS:Payment="-8198.000000" BIS:Payment_RUR="-8198.000000" BIS:NKD="0" BIS:NKD_RUR="0" BIS:PaymentDate="26.12.24 / " BIS:SettlementDate="26.12.24 / " BIS:ComExg="0.00" BIS:ComTS="0.00" BIS:ComDlr="-2.05" BIS:ComDlrCurrency="RUR" BIS:OrderTerm="1 день" BIS:Portfolio="11111111" BIS:isRPS="0" BIS:OperDateSort="25.12.2024 0:00:00" BIS:OperTimeSort="01.01.1900 15:51:56" BIS:IsOperWithoutPrice="0" BIS:IsPif="0" BIS:IsIB="0" />
+    </BIS:Trades>
+</BIS:BISPeriod>
