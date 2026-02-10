@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<?xml-stylesheet type="text/xsl" href="http://esign.aton-line.ru/templates/GetTemplateFile.aspx?file=repClientResidentPeriodXsl.45"?>
+<BIS:BISPeriod xmlns:BIS="http://www.aton.ru/templates/repClientResidentPeriodXsd.45">
+  <BIS:CommonData>
+    <BIS:Row BIS:CPID="11111111" BIS:BegDate="29.12.2023" BIS:EndDate="25.12.2024" BIS:MakeDate="26.12.2024" BIS:SBSType="2" BIS:WithSubAccounts="0" BIS:ContractNum="22222222" BIS:ContractDate="30.08.2024" BIS:IsFilial="1" BIS:DirectorShortName="Тест Т. С." BIS:ChiefOfficeShortName="Тест Т. С." BIS:CompanyName="ООО &quot;АТОН&quot;" BIS:LogoURL="http://www.aton-line.ru/images4reports/logo.gif" BIS:URLToReport="https://www.aton.ru/cc/inbox/byrequest/11111111/2023-12-29/2024-12-25" />
+  </BIS:CommonData>
+  <BIS:StockInOut>
+    <BIS:Row BIS:OperID="123456789" BIS:OperDate="02.10.24" BIS:SettlementDate="02.10.24" BIS:IntOperNum="csd1234567" BIS:Comment="Зачисление ЦБ" BIS:AssetName="Хэдхантер МКАО(C)" BIS:Quantity="100000.00000000" BIS:Portfolio="11111111" BIS:OperDateSort="02.10.2024 0:00:00" BIS:OperTimeSort="01.01.1900 13:15:50" BIS:Section="StockInOut" BIS:Price="0" BIS:ExSettlementDate="02.10.24" />
+  </BIS:StockInOut>
+  <BIS:ClientMoneyConvert>
+    <BIS:Row BIS:OperID="234567890" BIS:IntOperNum="fx234567 / 15.11.2018" BIS:OperDate="15.11.2018" BIS:Curr1="RUR" BIS:Sum1="68900.00" BIS:Sum1_RUR="68900.00" BIS:Date1="16.11.2018" BIS:Rate="66.6402" BIS:Curr2="USD" BIS:Sum2="1033.91" BIS:Sum2_RUR="68874.85" BIS:Date2="16.11.2018" BIS:Portfolio="11111111" BIS:OperTime="01.01.1900 16:40:30" BIS:OperDateSort="15.11.2018 0:00:00" BIS:Section="ClientMoneyConvert" BIS:ComSum="0" />
+  </BIS:ClientMoneyConvert>
+  <BIS:StockOnDate_Exg>
+    <BIS:Row BIS:OperPlace="ПАО Московская Биржа, Фондовый рынок" BIS:AssetCode="Хэдхантер МКАО(C)/RU000A107662/1-01-16755-A" BIS:QttyPlan="131089.00000000" BIS:QttyOut="139960.00000000" BIS:QttyOutAft="139960.00000000" BIS:PriceIn="0" BIS:PriceOut="3405" BIS:ValueIn="0.0000000000000" BIS:ValueOut="476423840.0000000000000" BIS:NKDIn="0.00" BIS:NKDOut="0.00" BIS:QttyIn="0.00000000" BIS:QttyInAft="0.00000000" BIS:IsOTC="0" />
+  </BIS:StockOnDate_Exg>
+  <BIS:MoneyOnDate_MarketPrc>
+    <BIS:Row BIS:n1="1" BIS:n2="1" BIS:Name="Рыночная стоимость активов" BIS:AssetCode="CHF" BIS:QtyBeg="0.00" BIS:QtyBeg_rub="0.00" BIS:QtyEnd="728195.00" BIS:QtyEnd_rub="80735926.30" />
+    <BIS:Row BIS:n1="1" BIS:n2="1" BIS:AssetCode="RUR" BIS:QtyBeg="0.00" BIS:QtyBeg_rub="0.00" BIS:QtyEnd="1331238921.73" BIS:QtyEnd_rub="1331238921.73" />
+  </BIS:MoneyOnDate_MarketPrc>
+  <BIS:MoneyOnDate_single>
+    <BIS:Row BIS:ChangeDebtsMZ="0.00" BIS:MoneyFSIn="0.00" BIS:MoneyFSOut="0.00" BIS:MoneyGKOIn="0.00" BIS:MoneyGKOOut="0.00" BIS:MoneyGTSGPIn="0.00" BIS:MoneyGTSGPOut="0.00" BIS:MicexRenamePAODate="19.12.2016" />
+  </BIS:MoneyOnDate_single>
+  <BIS:MoneyInOut_io>
+    <BIS:Row BIS:OperID="345678902" BIS:OperType="InOut" BIS:OperTypeSort="10" BIS:OperDate="09.09.24" BIS:PaymentDate="09.09.24" BIS:Quantity="13550000.00000000" BIS:Comment="Поступило на счет" BIS:Portfolio="11111111" BIS:OperDateSort="09.09.2024 0:00:00" BIS:OperTimeSort="01.01.1900 17:08:57" BIS:Currency="RUR" BIS:Quantity_RUR="13550000.00" />
+  </BIS:MoneyInOut_io>
+  <BIS:MoneyInOut>
+    <BIS:Row BIS:OperID="456789012" BIS:OperType="Brok" BIS:OperTypeSort="30" BIS:OperDate="16.11.18" BIS:PaymentDate="16.11.18" BIS:Quantity="-1062.00000000" BIS:Comment="Комиссионное вознаграждение за совершение конверсионной операции fx267943 согласно п.13 ТП ООО &quot;АТОН&quot; (в т. ч. НДС 18%)" BIS:Portfolio="11111111" BIS:OperDateSort="16.11.2018 0:00:00" BIS:OperTimeSort="01.01.1900 16:40:30" BIS:Currency="RUR" BIS:SettlementDate="16.11.18" BIS:IsIBStock="0" />
+  </BIS:MoneyInOut>
+  <BIS:MoneyOnDate>
+    <BIS:Row BIS:n1="3" BIS:n2="9999" BIS:Name="Доступно средств для заключения сделок" BIS:AssetCode="RUR" BIS:QtyBeg="0.00" BIS:QtyBeg_rub="0.00" BIS:QtyEnd="13629.03" BIS:QtyEnd_rub="13629.03" />
+    <BIS:Row BIS:n1="14" BIS:n2="1" BIS:Name="Планируемая позиция по денежным средствам" BIS:AssetCode="RUR" BIS:QtyBeg="0.00" BIS:QtyBeg_rub="0.00" BIS:QtyEnd="40225400.63" BIS:QtyEnd_rub="40225400.63" />
+  </BIS:MoneyOnDate>
+  <BIS:StockOnDate_Exg_Sum>
+    <BIS:Row BIS:ValueIn="0.0000000000000" BIS:ValueOut="2479627755.5400000000000" BIS:NKDIn="0.00" BIS:NKDOut="33048042.87" />
+  </BIS:StockOnDate_Exg_Sum>
+  <BIS:MoneyOnDate_sbs3>
+    <BIS:Row BIS:n1="1" BIS:n2="2" BIS:Name="Для сделок на фондовом рынке ПАО Московская Биржа" BIS:AssetCode="RUR" BIS:QtyBeg="0.00" BIS:QtyBeg_rub="0.00" BIS:QtyEnd="13629.03" BIS:QtyEnd_rub="13629.03" />
+  </BIS:MoneyOnDate_sbs3>
+  <BIS:Trades>
+    <BIS:Row BIS:OperID="567890123" BIS:isComplete="0" BIS:OperPlace="ПАО Московская Биржа, Фондовый рынок" BIS:IntOperNum="567890123, 25.12.24, 15:51:56, mcxs567890123" BIS:TradeType="Покупка" BIS:AssetName="Диасофт ПАО(C)/RU000A107ER5/1-01-84777-H" BIS:Quantity="2.00000000" BIS:Price="4099" BIS:PriceCurr="RUR" BIS:PaymentCurr="RUR" BIS:Payment="-8198.000000" BIS:Payment_RUR="-8198.000000" BIS:NKD="0" BIS:NKD_RUR="0" BIS:PaymentDate="26.12.24 / " BIS:SettlementDate="26.12.24 / " BIS:ComExg="0.00" BIS:ComTS="0.00" BIS:ComDlr="-2.05" BIS:ComDlrCurrency="RUR" BIS:OrderTerm="1 день" BIS:Portfolio="11111111" BIS:isRPS="0" BIS:OperDateSort="25.12.2024 0:00:00" BIS:OperTimeSort="01.01.1900 15:51:56" BIS:IsOperWithoutPrice="0" BIS:IsPif="0" BIS:IsIB="0" />
+  </BIS:Trades>
+</BIS:BISPeriod>
