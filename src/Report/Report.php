@@ -63,8 +63,6 @@ final class Report implements ReportInterface
                 $attrs = [];
 
                 foreach ($rowEl->attributes as $attr) {
-                    // В XML атрибуты типа BIS:OperID, но в DOM name будет "BIS:OperID" или "OperID" в зависимости от парсинга.
-                    // Нам удобнее хранить без префикса.
                     $key = $attr->localName ?? $attr->name;
                     $attrs[$key] = $attr->value;
                 }
