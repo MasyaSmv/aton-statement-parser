@@ -11,6 +11,8 @@ use DOMXPath;
 use MasyaSmv\AtonStatementParser\Exceptions\ParseException;
 use MasyaSmv\AtonStatementParser\Parsing\Contracts\ReportParserInterface;
 use MasyaSmv\AtonStatementParser\Report\AttributeBag;
+use MasyaSmv\AtonStatementParser\Report\DiagnosticCollection;
+use MasyaSmv\AtonStatementParser\Report\ParseDiagnostic;
 use MasyaSmv\AtonStatementParser\Report\Report;
 use MasyaSmv\AtonStatementParser\Report\Row;
 use MasyaSmv\AtonStatementParser\Xml\XPathFactory;
@@ -31,6 +33,8 @@ final class LegacyBisReportParser implements ReportParserInterface
 
         /** @var array<string, list<Row>> $sectionRows */
         $sectionRows = [];
+        /** @var list<ParseDiagnostic> $diagnostics */
+        $diagnostics = [];
 
         foreach ($period->childNodes as $child) {
             if (!$child instanceof DOMElement) {
@@ -39,32 +43,41 @@ final class LegacyBisReportParser implements ReportParserInterface
 
             /** @var string $sectionName */
             $sectionName = $child->localName;
+            /** @var string $namespace */
+            $namespace = $period->namespaceURI;
 
-            if ($sectionName === '') {
-                continue;
-            }
-
-            $namespace = $child->namespaceURI ?? $period->namespaceURI;
-
-            if ($namespace === null || $namespace === '') {
-                throw new ParseException('Namespace URI is missing for section: ' . $sectionName);
+            if (!KnownLegacySchema::isKnownSection($sectionName)) {
+                $diagnostics[] = new ParseDiagnostic(
+                    'unknown_legacy_section',
+                    'Unknown legacy BIS section: ' . $sectionName,
+                    'legacy',
+                    $sectionName
+                );
             }
 
             foreach ($child->getElementsByTagNameNS($namespace, 'Row') as $rowElement) {
-                if (!$rowElement instanceof DOMElement) {
-                    continue;
+                $attributes = $this->extractAttributes($rowElement);
+
+                foreach ($this->unexpectedFields($sectionName, $attributes) as $fieldName) {
+                    $diagnostics[] = new ParseDiagnostic(
+                        'unexpected_legacy_field',
+                        'Unexpected legacy BIS field "' . $fieldName . '" in section "' . $sectionName . '".',
+                        'legacy',
+                        $sectionName,
+                        $fieldName
+                    );
                 }
 
                 $sectionRows[$sectionName][] = new Row(
                     $sectionName,
                     $sectionName,
                     'Row',
-                    new AttributeBag($this->extractAttributes($rowElement))
+                    new AttributeBag($attributes)
                 );
             }
         }
 
-        return Report::fromRowsBySection($sectionRows);
+        return Report::fromRowsBySection($sectionRows, new DiagnosticCollection($diagnostics));
     }
 
     private function resolvePeriod(DOMXPath $xpath): DOMElement
@@ -75,11 +88,8 @@ final class LegacyBisReportParser implements ReportParserInterface
             throw new ParseException('Root node BIS:BISPeriod not found.');
         }
 
+        /** @var DOMElement $period */
         $period = $periodNodes->item(0);
-
-        if (!$period instanceof DOMElement) {
-            throw new ParseException('Root BIS:BISPeriod is not a valid element.');
-        }
 
         return $period;
     }
@@ -90,15 +100,36 @@ final class LegacyBisReportParser implements ReportParserInterface
         $attributes = [];
 
         foreach ($rowElement->attributes as $attribute) {
-            if (!$attribute instanceof DOMAttr) {
-                continue;
-            }
-
+            /** @var DOMAttr $attribute */
             /** @var string $key */
             $key = $attribute->localName;
             $attributes[$key] = $attribute->value;
         }
 
         return $attributes;
+    }
+
+    /**
+     * @param array<string, string> $attributes
+     * @return list<string>
+     */
+    private function unexpectedFields(string $sectionName, array $attributes): array
+    {
+        $allowedFields = KnownLegacySchema::allowedFieldsForSection($sectionName);
+
+        if ($allowedFields === null) {
+            return [];
+        }
+
+        $allowedLookup = array_fill_keys($allowedFields, true);
+        $unexpected = [];
+
+        foreach (array_keys($attributes) as $fieldName) {
+            if (!isset($allowedLookup[$fieldName])) {
+                $unexpected[] = $fieldName;
+            }
+        }
+
+        return $unexpected;
     }
 }

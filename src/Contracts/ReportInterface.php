@@ -14,6 +14,7 @@ use MasyaSmv\AtonStatementParser\Collections\StockPayingOffCollection;
 use MasyaSmv\AtonStatementParser\Collections\StockTransferCollection;
 use MasyaSmv\AtonStatementParser\Collections\TradeCollection;
 use MasyaSmv\AtonStatementParser\Dto\CommonData;
+use MasyaSmv\AtonStatementParser\Report\DiagnosticCollection;
 use MasyaSmv\AtonStatementParser\Report\Row;
 use MasyaSmv\AtonStatementParser\Report\Section;
 
@@ -46,4 +47,8 @@ interface ReportInterface
     public function corporateActionsIn(): CorporateActionCollection;
 
     public function corporateActionsOut(): CorporateActionCollection;
+
+    public function diagnostics(): DiagnosticCollection;
+
+    public function hasDiagnostics(): bool;
 }
