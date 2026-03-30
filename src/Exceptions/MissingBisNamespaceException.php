@@ -6,6 +6,6 @@ namespace MasyaSmv\AtonStatementParser\Exceptions;
 
 use RuntimeException;
 
-class ParseException extends RuntimeException
+final class MissingBisNamespaceException extends RuntimeException
 {
 }

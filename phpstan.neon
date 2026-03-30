@@ -1,11 +1,12 @@
 parameters:
-    level: 8
+    level: max
     paths:
         - src
         - tests
-
+    tmpDir: ./.cache/phpstan
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: false
+    inferPrivatePropertyTypeFromConstructor: true
     checkMissingIterableValueType: true
     checkGenericClassInNonGenericObjectType: true
-
-    ignoreErrors:
-        # - '#SomeKnownFalsePositive#'
+    checkMissingCallableSignature: true

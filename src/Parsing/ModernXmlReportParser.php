@@ -48,7 +48,8 @@ final class ModernXmlReportParser implements ReportParserInterface
                     continue;
                 }
 
-                $recordType = $recordElement->localName ?? '';
+                /** @var string $recordType */
+                $recordType = $recordElement->localName;
                 $sectionName = SectionNameResolver::resolveForNewFormat($sourceName, $recordType);
                 $fields = ModernFieldCanonicalizer::canonicalize(
                     $sourceName,
@@ -78,7 +79,8 @@ final class ModernXmlReportParser implements ReportParserInterface
                 continue;
             }
 
-            $fieldName = $fieldElement->localName ?? '';
+            /** @var string $fieldName */
+            $fieldName = $fieldElement->localName;
 
             if ($fieldName === '') {
                 continue;

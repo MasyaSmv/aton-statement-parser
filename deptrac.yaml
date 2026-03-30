@@ -1,0 +1,84 @@
+deptrac:
+  paths:
+    - ./src
+  exclude_files:
+    - '#.*Tests?.*#'
+  layers:
+    - name: Entry
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\AtonStatementParser$
+    - name: Contracts
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Contracts\\.*
+    - name: Parsing
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Parsing\\.*
+    - name: Xml
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Xml\\.*
+    - name: Normalizers
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Normalizers\\.*
+    - name: Report
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Report\\.*
+    - name: Dto
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Dto\\.*
+    - name: Collections
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Collections\\.*
+    - name: Mappers
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Mappers\\.*
+    - name: Exceptions
+      collectors:
+        - type: classLike
+          value: ^MasyaSmv\\AtonStatementParser\\Exceptions\\.*
+  ruleset:
+    Entry:
+      - Contracts
+      - Parsing
+      - Xml
+    Contracts: ~
+    Exceptions: ~
+    Normalizers: ~
+    Dto: ~
+    Xml:
+      - Exceptions
+    Contracts:
+      - Collections
+      - Dto
+      - Report
+    Parsing:
+      - Contracts
+      - Exceptions
+      - Normalizers
+      - Report
+      - Xml
+    Collections:
+      - Dto
+      - Report
+    Mappers:
+      - Contracts
+      - Dto
+      - Exceptions
+      - Report
+    Report:
+      - Collections
+      - Contracts
+      - Dto
+      - Exceptions
+      - Mappers
+      - Normalizers
+    Exceptions:
+      - Report

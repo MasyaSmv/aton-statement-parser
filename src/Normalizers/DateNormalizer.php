@@ -15,7 +15,7 @@ final class DateNormalizer
      * - 02.10.24
      * - 25.12.2024 0:00:00
      * - 01.01.1900 15:51:56
-     * - 26.12.24 /   (с мусором)
+     * - 26.12.24 /   (с мусором).
      */
     public static function toDate(?string $value): ?DateTimeImmutable
     {

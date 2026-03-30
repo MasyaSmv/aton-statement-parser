@@ -21,7 +21,6 @@ final class AtonStatementParserTest extends TestCase
     {
         $version = AtonStatementParser::version();
 
-        $this->assertIsString($version);
         $this->assertNotSame('', $version);
         $this->assertSame('0.1.0', $version);
     }

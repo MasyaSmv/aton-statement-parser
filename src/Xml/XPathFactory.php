@@ -6,7 +6,7 @@ namespace MasyaSmv\AtonStatementParser\Xml;
 
 use DOMDocument;
 use DOMXPath;
-use RuntimeException;
+use MasyaSmv\AtonStatementParser\Exceptions\MissingBisNamespaceException;
 
 final class XPathFactory
 {
@@ -18,7 +18,7 @@ final class XPathFactory
         $ns = $root?->namespaceURI;
 
         if (!is_string($ns) || $ns === '') {
-            throw new RuntimeException('Cannot detect BIS namespace from XML root element.');
+            throw new MissingBisNamespaceException('Cannot detect BIS namespace from XML root element.');
         }
 
         // Регистрируем префикс BIS на namespace, который реально в файле

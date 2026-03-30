@@ -19,8 +19,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, libxml
-          coverage: none
+          extensions: dom, libxml, mbstring, xml, xmlwriter
+          coverage: pcov
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
@@ -28,8 +28,20 @@ jobs:
       - name: Coding style (dry run)
         run: composer cs:check
 
+      - name: Architecture analysis (Deptrac)
+        run: composer deptrac
+
       - name: Static analysis (PHPStan)
         run: composer stan
 
+      - name: Static analysis (Psalm)
+        run: composer psalm
+
       - name: Tests
         run: composer test
+
+      - name: Coverage report
+        run: composer test:coverage
+
+      - name: Coverage threshold
+        run: composer coverage:check

@@ -36,6 +36,10 @@ final class XmlLoader
     {
         $xml = self::normalizeEncodingToUtf8($xml);
 
+        if (trim($xml) === '') {
+            throw new InvalidXmlException('Invalid XML: XML string is empty.');
+        }
+
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = false;
@@ -73,7 +77,11 @@ final class XmlLoader
 
         // Если в шапке явно указано windows-1251, конвертируем.
         if (stripos($xml, 'encoding="windows-1251"') !== false || stripos($xml, "encoding='windows-1251'") !== false) {
-            $xml = iconv('Windows-1251', 'UTF-8//IGNORE', $xml) ?: $xml;
+            $converted = iconv('Windows-1251', 'UTF-8//IGNORE', $xml);
+
+            if ($converted !== false) {
+                $xml = $converted;
+            }
 
             return preg_replace('/encoding=(\"|\')windows-1251(\"|\')/i', 'encoding="UTF-8"', $xml) ?? $xml;
         }

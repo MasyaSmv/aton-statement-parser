@@ -25,7 +25,7 @@ use MasyaSmv\AtonStatementParser\Contracts\Mappers\StockTransferMapperInterface;
 use MasyaSmv\AtonStatementParser\Contracts\Mappers\TradeMapperInterface;
 use MasyaSmv\AtonStatementParser\Contracts\ReportInterface;
 use MasyaSmv\AtonStatementParser\Dto\CommonData;
-use MasyaSmv\AtonStatementParser\Exceptions\ParseException;
+use MasyaSmv\AtonStatementParser\Exceptions\MissingSectionException;
 use MasyaSmv\AtonStatementParser\Mappers\CommonDataMapper;
 use MasyaSmv\AtonStatementParser\Mappers\CorporateActionMapper;
 use MasyaSmv\AtonStatementParser\Mappers\MoneyBalanceMapper;
@@ -107,7 +107,7 @@ final class Report implements ReportInterface
     public function section(string $name): Section
     {
         if (!isset($this->sections[$name])) {
-            throw new ParseException('Section not found: ' . $name);
+            throw new MissingSectionException('Section not found: ' . $name);
         }
 
         return $this->sections[$name];

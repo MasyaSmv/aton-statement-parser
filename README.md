@@ -48,8 +48,8 @@ $row = $report->findOperId('567890123');           // Row|null
 $ids = $report->operIds();                         // OperIdCollection
 
 // Удобные геттеры атрибутов
-$type = $report->section('Trades')->rows()[0]->getString('TradeType');
-$date = $report->section('Trades')->rows()[0]->getDate('OperDateSort'); // DateTimeImmutable|null
+$type = $report->section('Trades')->rows()->get(0)->getString('TradeType');
+$date = $report->section('Trades')->rows()->get(0)->getDate('OperDateSort'); // DateTimeImmutable|null
 ```
 
 ---
@@ -246,10 +246,29 @@ composer require masyasmv/aton-statement-parser
 ```bash
 composer install
 composer test
+composer deptrac
 composer cs:fix
 composer cs:check
 composer stan
+composer psalm
+composer test:coverage
+composer coverage:check
 ```
+
+Mutation testing вынесен в отдельный workflow и отдельную команду:
+
+```bash
+composer infection
+```
+
+Локально `composer infection` и `composer test:coverage` требуют coverage driver (`pcov` или `xdebug`).
+В CI они запускаются через `setup-php` с `pcov`.
+
+## Documentation
+
+Подробная карта библиотеки, слоёв, канонических секций, DTO API и точек расширения:
+
+- [docs/LibraryGuide.md](docs/LibraryGuide.md)
 
 ## Versioning
 

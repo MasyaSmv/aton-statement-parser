@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MasyaSmv\AtonStatementParser\Parsing;
 
 use DOMDocument;
-use MasyaSmv\AtonStatementParser\Exceptions\ParseException;
+use MasyaSmv\AtonStatementParser\Exceptions\UnsupportedReportFormatException;
 use MasyaSmv\AtonStatementParser\Parsing\Contracts\ReportParserInterface;
 use MasyaSmv\AtonStatementParser\Report\Report;
 
@@ -32,6 +32,6 @@ final class ReportParserResolver
 
         $rootName = $document->documentElement?->tagName ?? '[unknown]';
 
-        throw new ParseException('Unsupported XML report format. Root element: ' . $rootName);
+        throw new UnsupportedReportFormatException('Unsupported XML report format. Root element: ' . $rootName);
     }
 }

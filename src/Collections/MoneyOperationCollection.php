@@ -25,7 +25,7 @@ final class MoneyOperationCollection implements IteratorAggregate, Countable, Ar
     /** @param list<MoneyOperation> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int
@@ -58,11 +58,13 @@ final class MoneyOperationCollection implements IteratorAggregate, Countable, Ar
         return new ArrayIterator($this->items);
     }
 
+    /** @psalm-suppress RedundantConditionGivenDocblockType */
     public function offsetExists(mixed $offset): bool
     {
         return is_int($offset) && array_key_exists($offset, $this->items);
     }
 
+    /** @psalm-suppress DocblockTypeContradiction */
     public function offsetGet(mixed $offset): MoneyOperation
     {
         if (!is_int($offset)) {

@@ -25,7 +25,7 @@ final class TradeCollection implements IteratorAggregate, Countable, ArrayAccess
     /** @param list<Trade> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int
@@ -58,11 +58,13 @@ final class TradeCollection implements IteratorAggregate, Countable, ArrayAccess
         return new ArrayIterator($this->items);
     }
 
+    /** @psalm-suppress RedundantConditionGivenDocblockType */
     public function offsetExists(mixed $offset): bool
     {
         return is_int($offset) && array_key_exists($offset, $this->items);
     }
 
+    /** @psalm-suppress DocblockTypeContradiction */
     public function offsetGet(mixed $offset): Trade
     {
         if (!is_int($offset)) {

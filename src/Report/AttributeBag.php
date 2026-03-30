@@ -52,11 +52,13 @@ final class AttributeBag implements IteratorAggregate, Countable, ArrayAccess
         return new ArrayIterator($this->values);
     }
 
+    /** @psalm-suppress RedundantConditionGivenDocblockType */
     public function offsetExists(mixed $offset): bool
     {
         return is_string($offset) && array_key_exists($offset, $this->values);
     }
 
+    /** @psalm-suppress DocblockTypeContradiction */
     public function offsetGet(mixed $offset): ?string
     {
         if (!is_string($offset)) {
