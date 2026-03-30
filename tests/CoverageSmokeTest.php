@@ -24,6 +24,8 @@ use MasyaSmv\AtonStatementParser\Dto\StockPayingOff;
 use MasyaSmv\AtonStatementParser\Dto\StockTransfer;
 use MasyaSmv\AtonStatementParser\Dto\Trade;
 use MasyaSmv\AtonStatementParser\Report\AttributeBag;
+use MasyaSmv\AtonStatementParser\Report\DiagnosticCollection;
+use MasyaSmv\AtonStatementParser\Report\ParseDiagnostic;
 use MasyaSmv\AtonStatementParser\Report\Report;
 use MasyaSmv\AtonStatementParser\Report\Row;
 use MasyaSmv\AtonStatementParser\Report\Section;
@@ -97,6 +99,7 @@ final class CoverageSmokeTest extends TestCase
         $stockTransfer = new StockTransfer('4', 'StockInOut', 'OperationStockInOut', 'Bond', '7', '8', 'Main', 'Comment', '42', null, null, null, null, null);
         $stockPayingOff = new StockPayingOff('5', 'StockPayingOff', 'OperationStockPayOff', 'Bond', '3', '1000', 'USD', '3000', '3000', 'USD', '43', 'MTRT', 'Stk', 'Main', null, null, null, null, null, null);
         $corporateAction = new CorporateAction('6', 'CorpActionIn', 'OperationStockCorpActionIn', 'Bond', '1', '100', 'USD', '0', '0', 'Stk', 'Main', '44', null, null, null, null, null, null);
+        $diagnostic = new ParseDiagnostic('code', 'message', 'modern', 'Header', 'UnexpectedField');
 
         $rowCollection = new RowCollection([$row]);
         $operIdCollection = new OperIdCollection(['1', '2']);
@@ -108,6 +111,7 @@ final class CoverageSmokeTest extends TestCase
         $stockTransferCollection = new StockTransferCollection([$stockTransfer]);
         $stockPayingOffCollection = new StockPayingOffCollection([$stockPayingOff]);
         $corporateActionCollection = new CorporateActionCollection([$corporateAction]);
+        $diagnosticCollection = new DiagnosticCollection([$diagnostic]);
 
         $this->assertFalse($rowCollection->isEmpty());
         $this->assertSame($row, $rowCollection->first());
@@ -178,6 +182,26 @@ final class CoverageSmokeTest extends TestCase
         $this->assertTrue($corporateActionCollection->offsetExists(0));
         $this->assertFalse($corporateActionCollection->offsetExists(1));
         $this->assertSame([$corporateAction], iterator_to_array($corporateActionCollection));
+
+        $this->assertSame($diagnostic, $diagnosticCollection->first());
+        $this->assertFalse($diagnosticCollection->isEmpty());
+        $this->assertSame($diagnostic, $diagnosticCollection->get(0));
+        $this->assertSame($diagnostic, $diagnosticCollection->offsetGet(0));
+        $this->assertSame([$diagnostic], $diagnosticCollection->toArray());
+        $this->assertTrue($diagnosticCollection->offsetExists(0));
+        $this->assertFalse($diagnosticCollection->offsetExists(1));
+        $this->assertSame([$diagnostic], iterator_to_array($diagnosticCollection));
+        $this->assertSame('code', $diagnostic->code());
+        $this->assertSame('message', $diagnostic->message());
+        $this->assertSame('modern', $diagnostic->format());
+        $this->assertSame('Header', $diagnostic->structure());
+        $this->assertSame('UnexpectedField', $diagnostic->key());
+
+        $diagnosticWithoutContext = new ParseDiagnostic('code-2', 'message-2', 'legacy');
+        $this->assertSame('message-2', $diagnosticWithoutContext->message());
+        $this->assertSame('legacy', $diagnosticWithoutContext->format());
+        $this->assertNull($diagnosticWithoutContext->structure());
+        $this->assertNull($diagnosticWithoutContext->key());
     }
 
     public function testCollectionsReturnNullForFirstWhenEmpty(): void
@@ -192,6 +216,10 @@ final class CoverageSmokeTest extends TestCase
         $this->assertNull((new StockTransferCollection([]))->first());
         $this->assertNull((new StockPayingOffCollection([]))->first());
         $this->assertNull((new CorporateActionCollection([]))->first());
+        $diagnostics = new DiagnosticCollection([]);
+        $this->assertTrue($diagnostics->isEmpty());
+        $this->assertNull($diagnostics->first());
+        $this->assertNull($diagnostics->get(0));
     }
 
     public function testReportCanBuildFromRowsAndReturnEmptyDtoCollections(): void
@@ -218,6 +246,8 @@ final class CoverageSmokeTest extends TestCase
         $this->assertCount(0, $report->stockInOut());
         $this->assertCount(0, $report->stockPayingOff());
         $this->assertCount(0, $report->corporateActionsIn());
+        $this->assertFalse($report->hasDiagnostics());
+        $this->assertCount(0, $report->diagnostics());
         $this->assertCount(0, $report->corporateActionsOut());
     }
 

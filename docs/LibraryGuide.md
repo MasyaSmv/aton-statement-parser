@@ -69,6 +69,8 @@ flowchart TD
 - `src/Parsing/ReportParserResolver.php`
 - `src/Parsing/LegacyBisReportParser.php`
 - `src/Parsing/ModernXmlReportParser.php`
+- `src/Parsing/KnownLegacySchema.php`
+- `src/Parsing/KnownModernSchema.php`
 - `src/Parsing/ModernFieldCanonicalizer.php`
 - `src/Parsing/SectionNameResolver.php`
 
@@ -86,14 +88,28 @@ flowchart TD
 - `src/Report/Section.php`
 - `src/Report/Row.php`
 - `src/Report/AttributeBag.php`
+- `src/Report/ParseDiagnostic.php`
+- `src/Report/DiagnosticCollection.php`
 
 Ответственность:
 
 - представлять отчёт в общей структуре;
 - давать универсальный доступ к секциям и строкам;
-- хранить immutable-атрибуты и typed getters.
+- хранить immutable-атрибуты и typed getters;
+- возвращать диагностику по неизвестным структурам и synthetic compatibility sections.
 
-### 4. DTO слой
+### 4. Support слой
+
+Файлы:
+
+- `src/Support/DecimalStringMath.php`
+
+Ответственность:
+
+- точная арифметика над строковыми decimal-значениями;
+- derived aggregate-вычисления без перехода на `float`.
+
+### 5. DTO слой
 
 Файлы:
 
@@ -148,6 +164,8 @@ flowchart TD
 - `section(string $name): Section`
 - `operIds(): OperIdCollection`
 - `findOperId(string $operId): ?Row`
+- `diagnostics(): DiagnosticCollection`
+- `hasDiagnostics(): bool`
 
 ### DTO API
 
@@ -228,9 +246,40 @@ classDiagram
 - DTO: `src/Dto`, `src/Mappers`, `src/Collections`
 - контракты DTO-мапперов: `src/Contracts/Mappers`
 - исключения: `src/Exceptions`
+- диагностика структуры: `Report->diagnostics()`
 - тесты happy path: `tests/*Parse*`, `tests/DtoMappingTest.php`
 - тесты negative path: `tests/NegativeParseTest.php`
 - тесты immutable/guards: `tests/ImmutableCollectionsTest.php`
+- тесты паритета real fixtures: `tests/RealFixtureParityTest.php`
+
+## Подтверждённая канонизация old/new
+
+На текущем этапе библиотека уже проверяется не только на синтетических fixtures, но и на парных реальных отчётах из:
+
+- `tests/FixturesLocal/old`
+- `tests/FixturesLocal/new`
+
+Что уже подтверждено на совпадающих old/new парах:
+
+- core-секции совпадают по количеству строк после канонизации;
+- множества `OperID` совпадают между legacy и modern представлением;
+- `PortfolioMoney` нового формата больше не смешивается в один блок:
+  - `2_PortfolioMoney_ByType` -> `MoneyOnDate`
+  - `1_PortfolioMoney_Value` -> `MoneyOnDate_MarketPrc`
+  - `4_PortfolioMoney_ByOperPlace` -> `MoneyOnDate_ByOperPlace`
+- для `MoneyInOut_io` modern-отчётов библиотека схлопывает только строго симметричные `+/-` дубли одной операции, чтобы привести результат к legacy-compatible виду.
+- для modern-отчётов без прямого источника legacy singleton/aggregate-блоков библиотека сейчас добавляет совместимые derived sections:
+  - `MoneyOnDate_single` как synthetic legacy-compatibility row;
+  - `StockOnDate_Exg_Sum` как derived aggregate по всем строкам `StockOnDate_Exg`.
+- каждая synthetic compatibility section помечается диагностикой `synthetic_legacy_section`.
+- новые `source`, неизвестные legacy-секции и неожиданные поля в известных блоках попадают в `Report->diagnostics()` и не теряются молча.
+
+Что пока остаётся честно формат-специфичным:
+
+- семантика `MoneyOnDate_single` в modern-формате, так как прямого источника для её полей в XML не найдено и секция воспроизводится как compatibility row;
+- `MoneyOnDate_ByOperPlace`, так как это modern-only разбиение `PortfolioMoney`, для которого в legacy fixtures нет универсального прямого аналога.
+
+Эти блоки пока не принудительно смешиваются с основной канонической моделью без отдельного бизнес-решения.
 
 ## Проверки качества
 
@@ -259,6 +308,8 @@ Mutation testing поддерживается отдельно:
 - строки: `100%`
 - методы: `100%`
 - классы: `100%`
+- тесты: `115`
+- assertions: `790`
 
 ## CI и mutation testing
 

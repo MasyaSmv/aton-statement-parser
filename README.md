@@ -12,7 +12,9 @@
 * быстро выбрать нужный блок (`Trades`, `MoneyInOut`, `StockInOut`, `TradesRegRepo`, `ClientMoneyConvert`, `StockPayingOff`, …),
 * найти операцию по `OperID`,
 * собрать список всех `OperID` (например, для сверки с БД),
-* работать с атрибутами строк через удобные геттеры (строки/даты/числа) без «магических» индексов массива.
+* работать с атрибутами строк через удобные геттеры (строки/даты/числа) без «магических» индексов массива,
+* получать диагностику по новым или неожиданным структурам отчёта,
+* сохранять derived legacy-совместимые секции для modern XML там, где прямого источника нет.
 
 > Цель: минимальная боль при работе с реальными отчётами старого и нового форматов, сохраняя единый API.
 
@@ -46,6 +48,10 @@ $row = $report->findOperId('567890123');           // Row|null
 
 // Список всех OperID (для сверки)
 $ids = $report->operIds();                         // OperIdCollection
+
+// Диагностика неизвестных структур и ключей
+$diagnostics = $report->diagnostics();             // DiagnosticCollection
+$hasWarnings = $report->hasDiagnostics();          // bool
 
 // Удобные геттеры атрибутов
 $type = $report->section('Trades')->rows()->get(0)->getString('TradeType');
@@ -84,6 +90,16 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 ### 5) Десятичные числа
 
 Количество и суммы — строки с точностью (`100000.00000000`). Базовый слой хранит как string, а геттеры умеют приводить к float/int при необходимости.
+
+### 6) Новые структуры и неожиданные ключи
+
+Если брокер меняет XML и в отчёте появляется:
+
+* новый `source` в modern-формате,
+* неизвестная legacy-секция,
+* неожиданный ключ внутри уже известной структуры,
+
+библиотека не теряет данные молча. Она продолжает парсинг и добавляет предупреждения в `Report->diagnostics()`.
 
 ---
 
@@ -147,12 +163,18 @@ src/
     ReportParserResolver.php       // выбор парсера по формату документа
     LegacyBisReportParser.php      // старый BIS-формат
     ModernXmlReportParser.php      // новый root/source формат
+    KnownLegacySchema.php          // known-schema legacy секций и ключей
+    KnownModernSchema.php          // known-schema modern source и ключей
     SectionNameResolver.php        // канонизация имён секций
   Report/
     Report.php                     // секции отчёта
     Section.php                    // имя секции + RowCollection
     Row.php                        // строка секции + геттеры
     AttributeBag.php               // immutable-атрибуты строки
+    ParseDiagnostic.php            // диагностика структуры парсинга
+    DiagnosticCollection.php       // immutable коллекция диагностик
+  Support/
+    DecimalStringMath.php          // точная строковая арифметика для derived aggregate-секций
   Xml/
     XmlLoader.php                  // чтение файла, encoding -> utf8, DOM
     XPathFactory.php               // DOMXPath + регистрация namespace
@@ -201,7 +223,12 @@ tests/
 * [x] `Row->getDate($key): ?DateTimeImmutable` (с поддержкой форматов)
 * [x] Базовые тесты на даты/числа
 * [x] Фактический coverage доведён до `100%` по строкам/методам/классам
-* [ ] Довести канонизацию полей между old/new форматами
+* [x] Подтверждена паритетная канонизация core-секций на парных real fixtures `old/new`
+* [x] `PortfolioMoney` нового формата разложен на `MoneyOnDate`, `MoneyOnDate_MarketPrc`, `MoneyOnDate_ByOperPlace`
+* [x] Для `MoneyInOut_io` добавлено схлопывание строго симметричных `+/-` дублей до legacy-compatible результата
+* [x] `StockOnDate_Exg_Sum` нового формата вычисляется как derived aggregate по строкам `StockOnDate_Exg`
+* [x] Synthetic legacy-совместимые секции помечаются диагностикой `synthetic_legacy_section`
+* [ ] Уточнить бизнес-смысл `MoneyOnDate_single`, если для него появится прямой modern-источник или подтверждённая формула
 
 ### 🚧 Этап C — DTO (точечно, только нужное)
 
@@ -222,6 +249,9 @@ tests/
 
 * [ ] Фильтры/поиск: `section()->where(fn(Row $r) => ...)`
 * [ ] Индексация по `OperID` (лениво или при первом вызове)
+* [ ] Сортировка операций по дате/времени
+* [ ] Поиск по бумаге по названию и `ISIN`
+* [ ] Collection-style методы в духе ORM/Laravel: `count()`, `sum()`, `filter()`, `map()`, `firstWhere()`, `sortBy()`
 * [ ] Улучшение ошибок парсинга (контекст, позиция)
 
 ---

@@ -189,8 +189,9 @@ final class DtoMappingTest extends TestCase
         $moneyBalance = $moneyBalances->first();
         $this->assertNotNull($moneyBalance);
         $this->assertSame('RUR', $moneyBalance->assetCode());
-        $this->assertSame('2198895.28', $moneyBalance->quantityEnd());
-        $this->assertSame('2198895.28', $moneyBalance->quantityEndRur());
+        $this->assertSame('Available', $moneyBalance->part());
+        $this->assertSame('2231.28', $moneyBalance->quantityEnd());
+        $this->assertSame('2231.28', $moneyBalance->quantityEndRur());
 
         $stockBalances = $report->stockOnDate();
         $this->assertGreaterThan(0, $stockBalances->count());

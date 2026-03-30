@@ -24,6 +24,8 @@ use MasyaSmv\AtonStatementParser\Dto\StockPayingOff;
 use MasyaSmv\AtonStatementParser\Dto\StockTransfer;
 use MasyaSmv\AtonStatementParser\Dto\Trade;
 use MasyaSmv\AtonStatementParser\Report\AttributeBag;
+use MasyaSmv\AtonStatementParser\Report\DiagnosticCollection;
+use MasyaSmv\AtonStatementParser\Report\ParseDiagnostic;
 use MasyaSmv\AtonStatementParser\Report\Row;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
@@ -398,6 +400,33 @@ final class ImmutableCollectionsTest extends TestCase
         $this->expectExceptionMessage('CorporateActionCollection is immutable');
 
         unset($collection[0]);
+    }
+
+    public function testDiagnosticCollectionThrowsOnInvalidOffsetTypeAndUnset(): void
+    {
+        $collection = new DiagnosticCollection([new ParseDiagnostic('code', 'message', 'modern')]);
+
+        try {
+            $this->callOffsetGet($collection, 'bad');
+            $this->fail('Expected exception was not thrown.');
+        } catch (OutOfBoundsException $exception) {
+            $this->assertSame('Diagnostic index must be an integer.', $exception->getMessage());
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('DiagnosticCollection is immutable.');
+
+        unset($collection[0]);
+    }
+
+    public function testDiagnosticCollectionThrowsOnMutation(): void
+    {
+        $collection = new DiagnosticCollection([new ParseDiagnostic('code', 'message', 'modern')]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('DiagnosticCollection is immutable.');
+
+        $collection[] = new ParseDiagnostic('other', 'message', 'legacy');
     }
 
     private function makeTrade(): Trade

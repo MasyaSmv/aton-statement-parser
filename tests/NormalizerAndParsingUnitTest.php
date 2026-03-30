@@ -17,6 +17,7 @@ use MasyaSmv\AtonStatementParser\Parsing\SectionNameResolver;
 use MasyaSmv\AtonStatementParser\Xml\XmlLoader;
 use MasyaSmv\AtonStatementParser\Xml\XPathFactory;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class NormalizerAndParsingUnitTest extends TestCase
 {
@@ -135,6 +136,60 @@ XML);
         $this->assertSame('5.00000000', $row->getString('Quantity_RUR'));
     }
 
+    public function testModernXmlParserKeepsMoneyInOutRowsWhenQuantityIsMissing(): void
+    {
+        $document = new DOMDocument();
+        $document->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <source name="OperationMoneyInOut">
+    <OperationMoneyInOut>
+      <OperID>10</OperID>
+      <OperDate>24.12.2025</OperDate>
+      <PaymentDate>25.12.2025</PaymentDate>
+      <Currency>RUR</Currency>
+      <Portfolio>MAIN</Portfolio>
+      <Comment>Transfer</Comment>
+      <QuantityRUR>5.00000000</QuantityRUR>
+    </OperationMoneyInOut>
+    <OperationMoneyInOut>
+      <OperID>10</OperID>
+      <OperDate>24.12.2025</OperDate>
+      <PaymentDate>25.12.2025</PaymentDate>
+      <Currency>RUR</Currency>
+      <Portfolio>MAIN</Portfolio>
+      <Comment>Transfer</Comment>
+      <QuantityRUR>-5.00000000</QuantityRUR>
+    </OperationMoneyInOut>
+  </source>
+</root>
+XML);
+
+        $report = (new ModernXmlReportParser())->parse($document);
+        $rows = $report->section('MoneyInOut_io')->rows();
+        $firstRow = $rows->get(0);
+        $secondRow = $rows->get(1);
+
+        $this->assertCount(2, $rows);
+        $this->assertInstanceOf(\MasyaSmv\AtonStatementParser\Report\Row::class, $firstRow);
+        $this->assertInstanceOf(\MasyaSmv\AtonStatementParser\Report\Row::class, $secondRow);
+        $this->assertNull($firstRow->getString('Quantity'));
+        $this->assertNull($secondRow->getString('Quantity'));
+        $this->assertSame('5.00000000', $firstRow->getString('Quantity_RUR'));
+        $this->assertSame('-5.00000000', $secondRow->getString('Quantity_RUR'));
+    }
+
+    public function testModernParserReturnsNullForEmptyDerivedStockAggregate(): void
+    {
+        $parser = new ModernXmlReportParser();
+        $method = new ReflectionMethod(ModernXmlReportParser::class, 'deriveStockOnDateExgSumRow');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($parser, []);
+
+        $this->assertNull($result);
+    }
+
     public function testXPathFactoryRegistersNamespace(): void
     {
         $dom = new DOMDocument();
@@ -193,6 +248,9 @@ XML;
         $this->assertSame('TradesNonRegRepo', SectionNameResolver::resolveForNewFormat('TradeRepoNotSettled', 'TradeRepoNotSettled'));
         $this->assertSame('MoneyInOut', SectionNameResolver::resolveForNewFormat('OperationMoneyBrok', 'OperationMoneyBrok'));
         $this->assertSame('MoneyInOut_io', SectionNameResolver::resolveForNewFormat('OperationMoneyInOut', 'OperationMoneyInOut'));
+        $this->assertSame('MoneyOnDate', SectionNameResolver::resolveForNewFormat('PortfolioMoney', 'PortfolioMoney', ['Section' => '2_PortfolioMoney_ByType']));
+        $this->assertSame('MoneyOnDate_MarketPrc', SectionNameResolver::resolveForNewFormat('PortfolioMoney', 'PortfolioMoney', ['Section' => '1_PortfolioMoney_Value']));
+        $this->assertSame('MoneyOnDate_ByOperPlace', SectionNameResolver::resolveForNewFormat('PortfolioMoney', 'PortfolioMoney', ['Section' => '4_PortfolioMoney_ByOperPlace']));
         $this->assertSame('CorpActionIn', SectionNameResolver::resolveForNewFormat('OperationStockCorpActionIn', 'OperationStockCorpActionIn'));
         $this->assertSame('CorpActionOut', SectionNameResolver::resolveForNewFormat('OperationStockCorpActionOut', 'OperationStockCorpActionOut'));
         $this->assertSame('StockOnDate_MTL', SectionNameResolver::resolveForNewFormat('PortfolioStockMetal', 'PortfolioStockMetal'));
