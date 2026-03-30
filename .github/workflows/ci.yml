@@ -31,5 +31,8 @@ jobs:
       - name: Static analysis (PHPStan)
         run: composer stan
 
+      - name: Static analysis (Psalm)
+        run: composer psalm
+
       - name: Tests
         run: composer test

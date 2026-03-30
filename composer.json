@@ -51,8 +51,8 @@
     "test:coverage": "phpunit --coverage-text",
     "cs:check": "php-cs-fixer fix --diff --dry-run --allow-risky=yes",
     "cs:fix": "php-cs-fixer fix --allow-risky=yes",
-    "stan": "phpstan analyse -c phpstan.neon",
-    "psalm": "psalm --no-cache"
+    "stan": "phpstan analyse -c phpstan.neon --debug --no-progress",
+    "psalm": "psalm --no-cache --threads=1 --output-format=console"
   },
   "config": {
     "sort-packages": true,

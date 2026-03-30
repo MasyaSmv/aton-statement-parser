@@ -4,6 +4,7 @@
 /.phpunit.result.cache
 /.phpunit.cache/
 .phpunit.cache/
+/.cache/
 
 .php-cs-fixer.cache
 
