@@ -17,6 +17,7 @@
 6. Исключения
 7. Расширение библиотеки
 8. Проверки качества
+9. CI и mutation testing
 
 ## Точка входа
 
@@ -236,9 +237,46 @@ classDiagram
 Перед PR должны быть зелёными:
 
 - `composer cs:check`
+- `composer deptrac`
 - `composer stan`
 - `composer psalm`
 - `composer test`
+- `composer test:coverage`
+- `composer coverage:check`
+
+Mutation testing поддерживается отдельно:
+
+- `composer infection`
+
+Практически это значит:
+
+- основной CI блокирует PR на style, architecture, static analysis, tests и coverage threshold;
+- mutation testing вынесен в отдельный workflow, потому что он ощутимо тяжелее обычного CI;
+- локально `infection` и coverage-команды требуют coverage driver (`pcov` или `xdebug`).
+
+## CI и mutation testing
+
+Основной workflow:
+
+- `.github/workflows/ci.yml`
+
+Проверяет:
+
+- `composer cs:check`
+- `composer deptrac`
+- `composer stan`
+- `composer psalm`
+- `composer test`
+- `composer test:coverage`
+- `composer coverage:check`
+
+Отдельный mutation workflow:
+
+- `.github/workflows/mutation.yml`
+
+Он запускается вручную или по расписанию и выполняет:
+
+- `composer infection`
 
 ## Релизы
 

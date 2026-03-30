@@ -5,6 +5,8 @@
 /.phpunit.cache/
 .phpunit.cache/
 /.cache/
+/build/
+/.deptrac.cache
 
 .php-cs-fixer.cache
 
