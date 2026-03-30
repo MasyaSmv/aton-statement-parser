@@ -13,7 +13,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<string, string>
- * @implements ArrayAccess<string, string>
+ * @implements ArrayAccess<mixed, string>
  */
 final class AttributeBag implements IteratorAggregate, Countable, ArrayAccess
 {

@@ -15,7 +15,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, MoneyConvertOperation>
- * @implements ArrayAccess<int, MoneyConvertOperation>
+ * @implements ArrayAccess<mixed, MoneyConvertOperation>
  */
 final class MoneyConvertCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -25,7 +25,7 @@ final class MoneyConvertCollection implements IteratorAggregate, Countable, Arra
     /** @param list<MoneyConvertOperation> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MasyaSmv\AtonStatementParser\Parsing;
 
+use DOMAttr;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
@@ -36,7 +37,7 @@ final class LegacyBisReportParser implements ReportParserInterface
                 continue;
             }
 
-            $sectionName = $child->localName ?? '';
+            $sectionName = $this->normalizeLocalName($child->localName);
 
             if ($sectionName === '') {
                 continue;
@@ -88,10 +89,19 @@ final class LegacyBisReportParser implements ReportParserInterface
         $attributes = [];
 
         foreach ($rowElement->attributes as $attribute) {
-            $key = $attribute->localName ?? $attribute->name;
+            if (!$attribute instanceof DOMAttr) {
+                continue;
+            }
+
+            $key = $this->normalizeLocalName($attribute->localName);
             $attributes[$key] = $attribute->value;
         }
 
         return $attributes;
+    }
+
+    private function normalizeLocalName(?string $localName): string
+    {
+        return $localName ?? '';
     }
 }

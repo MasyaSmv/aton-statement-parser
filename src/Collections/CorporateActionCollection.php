@@ -15,7 +15,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, CorporateAction>
- * @implements ArrayAccess<int, CorporateAction>
+ * @implements ArrayAccess<mixed, CorporateAction>
  */
 final class CorporateActionCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -25,7 +25,7 @@ final class CorporateActionCollection implements IteratorAggregate, Countable, A
     /** @param list<CorporateAction> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int

@@ -14,7 +14,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, string>
- * @implements ArrayAccess<int, string>
+ * @implements ArrayAccess<mixed, string>
  */
 final class OperIdCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -24,7 +24,7 @@ final class OperIdCollection implements IteratorAggregate, Countable, ArrayAcces
     /** @param list<string> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int

@@ -24,7 +24,6 @@ final class CoreParseTest extends TestCase
 
         // Проверим, что каждый id - непустая строка
         foreach ($ids as $id) {
-            $this->assertIsString($id);
             $this->assertNotSame('', $id);
         }
     }

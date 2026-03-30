@@ -61,14 +61,12 @@ final class ImmutableCollectionsTest extends TestCase
     public function testOperIdCollectionThrowsOnInvalidIndexAndMutation(): void
     {
         $collection = new OperIdCollection(['1']);
-        /** @var mixed $offset */
-        $offset = 'foo';
 
         try {
-            $collection->offsetGet($offset);
+            $collection->get(10);
             $this->fail('Expected exception was not thrown.');
         } catch (OutOfBoundsException $exception) {
-            $this->assertStringContainsString('OperID index must be integer', $exception->getMessage());
+            $this->assertStringContainsString('OperID index out of bounds', $exception->getMessage());
         }
 
         $this->expectException(LogicException::class);

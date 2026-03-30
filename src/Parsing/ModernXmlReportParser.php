@@ -48,7 +48,7 @@ final class ModernXmlReportParser implements ReportParserInterface
                     continue;
                 }
 
-                $recordType = $recordElement->localName ?? '';
+                $recordType = $this->normalizeLocalName($recordElement->localName);
                 $sectionName = SectionNameResolver::resolveForNewFormat($sourceName, $recordType);
                 $fields = ModernFieldCanonicalizer::canonicalize(
                     $sourceName,
@@ -78,7 +78,7 @@ final class ModernXmlReportParser implements ReportParserInterface
                 continue;
             }
 
-            $fieldName = $fieldElement->localName ?? '';
+            $fieldName = $this->normalizeLocalName($fieldElement->localName);
 
             if ($fieldName === '') {
                 continue;
@@ -88,5 +88,10 @@ final class ModernXmlReportParser implements ReportParserInterface
         }
 
         return $fields;
+    }
+
+    private function normalizeLocalName(?string $localName): string
+    {
+        return $localName ?? '';
     }
 }

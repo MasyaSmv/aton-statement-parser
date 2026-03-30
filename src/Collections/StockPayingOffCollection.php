@@ -15,7 +15,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, StockPayingOff>
- * @implements ArrayAccess<int, StockPayingOff>
+ * @implements ArrayAccess<mixed, StockPayingOff>
  */
 final class StockPayingOffCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -25,7 +25,7 @@ final class StockPayingOffCollection implements IteratorAggregate, Countable, Ar
     /** @param list<StockPayingOff> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int

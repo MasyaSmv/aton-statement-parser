@@ -15,7 +15,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, Row>
- * @implements ArrayAccess<int, Row>
+ * @implements ArrayAccess<mixed, Row>
  */
 final class RowCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -25,7 +25,7 @@ final class RowCollection implements IteratorAggregate, Countable, ArrayAccess
     /** @param list<Row> $items */
     public function __construct(array $items)
     {
-        $this->items = array_values($items);
+        $this->items = $items;
     }
 
     public function count(): int
