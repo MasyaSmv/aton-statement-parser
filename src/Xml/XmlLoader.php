@@ -36,6 +36,10 @@ final class XmlLoader
     {
         $xml = self::normalizeEncodingToUtf8($xml);
 
+        if (trim($xml) === '') {
+            throw new InvalidXmlException('Invalid XML: XML string is empty.');
+        }
+
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = false;

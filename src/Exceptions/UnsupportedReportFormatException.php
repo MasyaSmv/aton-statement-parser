@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MasyaSmv\AtonStatementParser\Exceptions;
 
-use RuntimeException;
-
-class ParseException extends RuntimeException
+final class UnsupportedReportFormatException extends ParseException
 {
 }
