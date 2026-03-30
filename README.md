@@ -249,7 +249,14 @@ composer test
 composer cs:fix
 composer cs:check
 composer stan
+composer psalm
 ```
+
+## Documentation
+
+Подробная карта библиотеки, слоёв, канонических секций, DTO API и точек расширения:
+
+- [docs/LibraryGuide.md](docs/LibraryGuide.md)
 
 ## Versioning
 

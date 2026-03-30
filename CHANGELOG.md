@@ -6,6 +6,17 @@ The format is based on Keep a Changelog and the project follows Semantic Version
 
 ## [Unreleased]
 
+### Added
+
+- Detailed library guide with architecture map, canonical sections, DTO API and Mermaid diagrams.
+- Psalm execution in CI alongside PHP CS Fixer, PHPStan and PHPUnit.
+
+### Changed
+
+- Tightened PHPStan, Psalm and PHP CS Fixer configuration based on conventions used in mature PHP libraries.
+- Aligned parser, XML loader, collections and tests with stricter static analysis rules.
+- Added project cache directory ignore rules for local tooling output.
+
 ## [0.1.0] - 2026-03-30
 
 ### Added
