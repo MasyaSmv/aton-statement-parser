@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MasyaSmv\AtonStatementParser\Exceptions;
 
-use RuntimeException;
 use MasyaSmv\AtonStatementParser\Report\Row;
+use RuntimeException;
 
 final class DtoMappingException extends RuntimeException
 {

@@ -69,8 +69,7 @@ final class Report implements ReportInterface
         ?StockTransferMapperInterface $stockTransferMapper = null,
         ?StockPayingOffMapperInterface $stockPayingOffMapper = null,
         ?CorporateActionMapperInterface $corporateActionMapper = null
-    )
-    {
+    ) {
         $this->commonDataMapper = $commonDataMapper ?? new CommonDataMapper();
         $this->tradeMapper = $tradeMapper ?? new TradeMapper();
         $this->moneyOperationMapper = $moneyOperationMapper ?? new MoneyOperationMapper();

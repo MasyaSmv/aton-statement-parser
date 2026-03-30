@@ -38,6 +38,7 @@ final class ModernXmlReportParser implements ReportParserInterface
             }
 
             $sourceName = trim($sourceElement->getAttribute('name'));
+
             if ($sourceName === '') {
                 throw new ParseException('Source name is missing in modern XML report.');
             }
@@ -78,6 +79,7 @@ final class ModernXmlReportParser implements ReportParserInterface
             }
 
             $fieldName = $fieldElement->localName ?? '';
+
             if ($fieldName === '') {
                 continue;
             }

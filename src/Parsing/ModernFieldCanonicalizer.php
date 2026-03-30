@@ -120,6 +120,7 @@ final class ModernFieldCanonicalizer
         }
 
         $operDate = self::expandShortDate(self::normalizeDateLikeValue($fields['Date1'] ?? ''));
+
         if ($operDate !== '') {
             $fields['OperDate'] ??= $operDate;
             $fields['OperDateSort'] ??= $operDate . ' 0:00:00';
@@ -236,6 +237,7 @@ final class ModernFieldCanonicalizer
             $fields['Price'] ??= '';
             $fields['Section'] ??= 'StockPayingOff';
             $fields['GroupID'] ??= 'Stk';
+
             if (isset($fields['PayingSumRUR'])) {
                 $fields['PayingSum_RUR'] ??= $fields['PayingSumRUR'];
             }

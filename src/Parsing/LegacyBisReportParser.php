@@ -37,11 +37,13 @@ final class LegacyBisReportParser implements ReportParserInterface
             }
 
             $sectionName = $child->localName ?? '';
+
             if ($sectionName === '') {
                 continue;
             }
 
             $namespace = $child->namespaceURI ?? $period->namespaceURI;
+
             if ($namespace === null || $namespace === '') {
                 throw new ParseException('Namespace URI is missing for section: ' . $sectionName);
             }

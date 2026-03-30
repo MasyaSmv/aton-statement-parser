@@ -57,6 +57,7 @@ final class DtoMappingTest extends TestCase
         $this->assertGreaterThan(0, $trades->count());
 
         $repoTrade = null;
+
         foreach ($trades as $trade) {
             if ($trade->section() === 'TradesRegRepo') {
                 $repoTrade = $trade;
@@ -72,6 +73,7 @@ final class DtoMappingTest extends TestCase
         $this->assertGreaterThan(0, $moneyOperations->count());
 
         $moneyIo = null;
+
         foreach ($moneyOperations as $operation) {
             if ($operation->section() === 'MoneyInOut_io') {
                 $moneyIo = $operation;
@@ -99,6 +101,7 @@ final class DtoMappingTest extends TestCase
 
         $clientConvert = null;
         $nonClientConvert = null;
+
         foreach ($moneyConvert as $operation) {
             if ($operation->section() === 'ClientMoneyConvert') {
                 $clientConvert = $operation;
@@ -204,6 +207,7 @@ final class DtoMappingTest extends TestCase
         $this->assertGreaterThan(0, $metalBalances->count());
 
         $metalBalance = null;
+
         foreach ($metalBalances as $balance) {
             if ($balance->section() === 'StockOnDate_MTL') {
                 $metalBalance = $balance;
