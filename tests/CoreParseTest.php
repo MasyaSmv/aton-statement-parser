@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class CoreParseTest extends TestCase
 {
-    public function test_can_parse_sections_and_operids(): void
+    public function testCanParseSectionsAndOperIds(): void
     {
         $path = __DIR__ . '/Fixtures/sample.xml';
 
@@ -20,8 +20,7 @@ final class CoreParseTest extends TestCase
 
         $ids = $report->operIds();
 
-        $this->assertIsArray($ids);
-        $this->assertNotEmpty($ids);
+        $this->assertGreaterThan(0, $ids->count());
 
         // Проверим, что каждый id - непустая строка
         foreach ($ids as $id) {

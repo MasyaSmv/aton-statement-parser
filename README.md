@@ -1,19 +1,24 @@
 # aton-statement-parser
 
-Пакет для парсинга XML-отчётов брокера **Атон** (формат `BIS:BISPeriod`) в удобную структуру данных, чтобы в проекте можно было:
+Пакет для парсинга XML-отчётов брокера **Атон** в удобную доменную структуру данных. Сейчас библиотека ориентирована на поддержку:
+
+* старого BIS-формата `BIS:BISPeriod`,
+* нового XML-формата на основе `<root><source name="...">`.
+
+Цель та же: привести оба формата к единой модели отчёта, чтобы в проекте можно было:
 
 * передать путь до XML-файла,
-* получить объект отчёта (`Report`),
-* быстро выбрать нужный блок (`Trades`, `MoneyInOut`, `StockInOut`, …),
+* получить объект отчёта (`ReportInterface`),
+* быстро выбрать нужный блок (`Trades`, `MoneyInOut`, `StockInOut`, `TradesRegRepo`, `ClientMoneyConvert`, `StockPayingOff`, …),
 * найти операцию по `OperID`,
 * собрать список всех `OperID` (например, для сверки с БД),
 * работать с атрибутами строк через удобные геттеры (строки/даты/числа) без «магических» индексов массива.
 
-> Цель: минимальная боль при работе с реальными отчётами (namespaces, windows-1251, разные форматы дат, дробные числа).
+> Цель: минимальная боль при работе с реальными отчётами старого и нового форматов, сохраняя единый API.
 
 ---
 
-## Быстрый старт (планируемый API)
+## Быстрый старт
 
 ```php
 use MasyaSmv\AtonStatementParser\AtonStatementParser;
@@ -21,14 +26,26 @@ use MasyaSmv\AtonStatementParser\AtonStatementParser;
 $report = AtonStatementParser::fromFile('/path/to/report.xml');
 
 // Доступ к секциям (универсально)
-$trades = $report->section('Trades')->rows();      // Row[]
-$money  = $report->section('MoneyInOut')->rows();  // Row[]
+$trades = $report->section('Trades')->rows();      // RowCollection
+$money  = $report->section('MoneyInOut')->rows();  // RowCollection
+
+// DTO-уровень для типовых сценариев
+$commonData = $report->commonData();               // ?CommonData
+$tradeDtos  = $report->trades();                   // TradeCollection
+$moneyDtos  = $report->moneyInOut();               // MoneyOperationCollection
+$moneyState = $report->moneyOnDate();              // MoneyBalanceCollection
+$stockState = $report->stockOnDate();              // StockBalanceCollection
+$fxDtos     = $report->moneyConvert();             // MoneyConvertCollection
+$stockDtos  = $report->stockInOut();               // StockTransferCollection
+$payoffDtos = $report->stockPayingOff();           // StockPayingOffCollection
+$corpInDtos = $report->corporateActionsIn();       // CorporateActionCollection
+$corpOutDtos = $report->corporateActionsOut();     // CorporateActionCollection
 
 // Поиск по OperID
 $row = $report->findOperId('567890123');           // Row|null
 
 // Список всех OperID (для сверки)
-$ids = $report->operIds();                         // array<int|string>
+$ids = $report->operIds();                         // OperIdCollection
 
 // Удобные геттеры атрибутов
 $type = $report->section('Trades')->rows()[0]->getString('TradeType');
@@ -39,15 +56,19 @@ $date = $report->section('Trades')->rows()[0]->getDate('OperDateSort'); // DateT
 
 ## Проблемы, которые решает пакет
 
-### 1) Namespace BIS
+### 1) Два формата отчёта
+
+Старые отчёты используют `BIS:BISPeriod`, новые идут через `<root><source name="...">`. Библиотека должна уметь читать оба формата и сводить их к одной модели.
+
+### 2) Namespace BIS
 
 XML использует `xmlns:BIS=...`, значит нельзя просто «по имени тега» — нужен XPath с корректной регистрацией namespace.
 
-### 2) Кодировка windows-1251
+### 3) Кодировка windows-1251 и UTF-8 BOM
 
-В шапке отчёта встречается `encoding="windows-1251"`. Пакет должен безопасно перевести документ в UTF-8 перед парсингом.
+В старых отчётах встречается `encoding="windows-1251"`, а в новых возможен `utf-8` с BOM. Пакет должен безопасно привести документ к корректному виду перед парсингом.
 
-### 3) Разные форматы дат
+### 4) Разные форматы дат
 
 В отчётах встречаются:
 
@@ -58,7 +79,9 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 
 Нужен нормализатор даты: трим + поддержка `d.m.Y` и `d.m.y`.
 
-### 4) Десятичные числа
+В новом формате встречаются и ISO-значения, например `2024-02-01T00:00:00`.
+
+### 5) Десятичные числа
 
 Количество и суммы — строки с точностью (`100000.00000000`). Базовый слой хранит как string, а геттеры умеют приводить к float/int при необходимости.
 
@@ -70,12 +93,14 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 
 * **Report** — весь отчёт, доступ к секциям и общим данным.
 * **Section** — один блок внутри отчёта (например `Trades`, `MoneyInOut`).
-* **Row** — одна строка `<BIS:Row .../>` внутри секции. Хранит атрибуты + типовые геттеры.
+* **Row** — одна строка секции в каноническом виде. Хранит имя секции, исходный тип записи, immutable-атрибуты и типовые геттеры.
+* **RowCollection / OperIdCollection / AttributeBag** — immutable коллекции и value objects для публичной модели.
 
 ### Уровни удобства
 
 1. **Базовый (универсальный)**: `Report/Section/Row` — работает для любых секций без генерации десятков DTO.
-2. **Продвинутый (DTO для популярных секций)**: `TradeDto`, `MoneyInOutDto` и т.п. — добавляются постепенно, когда станет понятно, что реально часто используется.
+2. **Продвинутый (DTO для популярных секций)**: `CommonData`, `Trade`, `MoneyOperation` и т.п. — добавляются постепенно поверх канонической модели.
+   На текущем этапе доступны также DTO для `MoneyOnDate`, `StockOnDate*`, `MoneyConvert`, `StockInOut`, `StockPayingOff`, `CorpActionIn`, `CorpActionOut`.
 
 ---
 
@@ -84,10 +109,50 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 ```text
 src/
   AtonStatementParser.php          // fromFile/fromString
+  Collections/
+    CorporateActionCollection.php   // immutable коллекция корпоративных действий
+    MoneyBalanceCollection.php      // immutable коллекция денежных остатков
+    MoneyConvertCollection.php      // immutable коллекция конверсионных операций
+    MoneyOperationCollection.php    // immutable коллекция денежных операций
+    RowCollection.php              // immutable коллекция строк
+    OperIdCollection.php           // immutable коллекция OperID
+    StockBalanceCollection.php     // immutable коллекция остатков по бумагам
+    StockPayingOffCollection.php   // immutable коллекция погашений/выплат
+    StockTransferCollection.php    // immutable коллекция переводов бумаг
+    TradeCollection.php            // immutable коллекция сделок
+  Contracts/
+    Mappers/
+      ...MapperInterface.php       // интерфейсы DTO-мапперов
+  Dto/
+    CommonData.php                 // DTO общих данных отчёта
+    CorporateAction.php            // DTO корпоративного действия
+    MoneyBalance.php               // DTO денежного остатка
+    MoneyConvertOperation.php      // DTO валютной конверсии
+    Trade.php                      // DTO сделки
+    MoneyOperation.php             // DTO денежной операции
+    StockBalance.php               // DTO остатка по бумаге
+    StockPayingOff.php             // DTO погашения/выплаты по бумаге
+    StockTransfer.php              // DTO перевода/списания бумаги
+  Mappers/
+    CommonDataMapper.php           // Row -> CommonData
+    CorporateActionMapper.php      // Row -> CorporateAction
+    MoneyBalanceMapper.php         // Row -> MoneyBalance
+    MoneyConvertMapper.php         // Row -> MoneyConvertOperation
+    TradeMapper.php                // Row -> Trade
+    MoneyOperationMapper.php       // Row -> MoneyOperation
+    StockBalanceMapper.php         // Row -> StockBalance
+    StockPayingOffMapper.php       // Row -> StockPayingOff
+    StockTransferMapper.php        // Row -> StockTransfer
+  Parsing/
+    ReportParserResolver.php       // выбор парсера по формату документа
+    LegacyBisReportParser.php      // старый BIS-формат
+    ModernXmlReportParser.php      // новый root/source формат
+    SectionNameResolver.php        // канонизация имён секций
   Report/
-    Report.php                     // секции + commonData
-    Section.php                    // имя секции + Row[]
-    Row.php                        // атрибуты BIS:Row + геттеры
+    Report.php                     // секции отчёта
+    Section.php                    // имя секции + RowCollection
+    Row.php                        // строка секции + геттеры
+    AttributeBag.php               // immutable-атрибуты строки
   Xml/
     XmlLoader.php                  // чтение файла, encoding -> utf8, DOM
     XPathFactory.php               // DOMXPath + регистрация namespace
@@ -112,62 +177,51 @@ tests/
 
 ### ✅ Уже сделано
 
-- [x] Базовый каркас пакета (autoload, структура, базовые тесты)
-- [x] Fixtures подключены в тесты
-- [x] Composer scripts: `test`, `cs:*`, `stan`
+* [x] Базовый каркас пакета (autoload, тесты)
+* [x] Fixtures подключены в тесты
+* [x] Скрипты composer для `test`, `cs:*`, `stan` (если настроено)
+* [x] Поддержка старого BIS-формата
+* [x] Базовая поддержка нового root/source формата
+* [x] Immutable collections в публичной модели
 
-#### Этап A — «сразу полезно» (ядро парсинга)
-- [x] `AtonStatementParser::fromFile(string $path): Report`
-- [x] `AtonStatementParser::fromString(string $xml): Report`
-- [x] `Report->section(string $name): Section`
-- [x] `Section->rows(): array<Row>`
-- [x] `Report->operIds(): array` (собрать `OperID` по секциям)
-- [x] `Report->findOperId(string $id): ?Row`
-- [x] Unit-тесты на fixtures (operIds/findOperId/section)
+### 🚧 Этап A — «сразу полезно»
 
-#### Этап B — нормализация типов (typed getters)
-- [x] `Row->getString($key)`
-- [x] `Row->getInt($key)`
-- [x] `Row->getFloat($key)`
-- [x] `Row->getDecimalString($key)` (без потери точности)
-- [x] `Row->getBool($key)`
-- [x] `Row->getDate($key): ?DateTimeImmutable`
-- [x] Поддержка форматов дат/времени из реальных отчётов:
-  - [x] `dd.mm.yy` → расширение до `dd.mm.yyyy`
-  - [x] `OperDateSort="dd.mm.yyyy 0:00:00"` (время всегда 00:00:00)
-  - [x] `OperTimeSort="01.01.1900 HH:ii:ss"` (дата фиксированная, важно время)
-  - [x] значения вида `26.12.24 / ` (чистка мусора)
-  - [x] стабильный парсинг даты без “текущего времени” (через `!` в форматах)
-- [x] Тесты на даты/числа + реалистичный fixture
+* [x] `AtonStatementParser::fromFile(string $path): ReportInterface`
+* [x] `AtonStatementParser::fromString(string $xml): ReportInterface`
+* [x] `Report->section(string $name): Section`
+* [x] `Section->rows(): RowCollection`
+* [x] `Report->operIds(): OperIdCollection`
+* [x] `Report->findOperId(string $id): ?Row`
+* [x] Unit-тесты на fixtures (operIds/findOperId/section)
 
----
+### 🚧 Этап B — нормализация типов
 
-### 🚧 Запланировано
+* [x] `Row->getString($key)` / `getInt($key)` / `getFloat($key)`
+* [x] `Row->getDecimalString($key)` (без потери точности)
+* [x] `Row->getDate($key): ?DateTimeImmutable` (с поддержкой форматов)
+* [x] Базовые тесты на даты/числа
+* [ ] Довести канонизацию полей между old/new форматами
 
-#### Этап C — доменные секции (удобный API без раздувания Row)
-- [ ] `Row->getStringRequired()` / `getIntRequired()` / `getDecimalStringRequired()` / `getDateRequired()` (кидают исключение с контекстом)
-- [ ] Доменные “обёртки” по секциям:
-  - [ ] `TradeRow` (секция `Trades`)
-  - [ ] `MoneyInOutRow` (секция `MoneyInOut`)
-  - [ ] `StockInOutRow` (секция `StockInOut`)
-  - [ ] `ClientMoneyConvertRow` (секция `ClientMoneyConvert`)
-- [ ] Сахар на уровне `Report/Section`:
-  - [ ] `Report->trades(): array<TradeRow>` (или `section('Trades')->asTrades()`)
-  - [ ] `Report->moneyInOut(): array<MoneyInOutRow>`
-- [ ] Тесты доменных секций
+### 🚧 Этап C — DTO (точечно, только нужное)
 
-#### Этап D — DTO (точечно, только нужное)
-- [ ] `TradeDto`, `MoneyInOutDto` (минимальный набор полей, нужный проекту)
-- [ ] Мапперы секций → DTO (через доменные row-обёртки)
-- [ ] Тесты DTO-маппинга (валидные/невалидные строки, обязательные поля)
+* [x] `Report->trades(): TradeCollection`
+* [x] `Report->moneyInOut(): MoneyOperationCollection`
+* [x] `Report->moneyOnDate(): MoneyBalanceCollection`
+* [x] `Report->stockOnDate(): StockBalanceCollection`
+* [x] `Report->moneyConvert(): MoneyConvertCollection`
+* [x] `Report->stockInOut(): StockTransferCollection`
+* [x] `Report->stockPayingOff(): StockPayingOffCollection`
+* [x] `Report->corporateActionsIn(): CorporateActionCollection`
+* [x] `Report->corporateActionsOut(): CorporateActionCollection`
+* [x] Базовые мапперы секций → DTO
+* [x] Расширить DTO-покрытие на дополнительные секции
+* [x] Довести базовые тесты DTO-маппинга
 
-#### Этап E — удобства для больших отчётов
-- [ ] Фильтрация/поиск по секции:
-  - [ ] `section()->filter(fn(Row $r) => ...)`
-  - [ ] `section()->firstWhere(...)`
-- [ ] Индексация по `OperID` (лениво или при первом вызове)
-- [ ] Улучшение ошибок парсинга (контекст: секция, ключ, значение)
-- [ ] (Опционально) оптимизация под большие XML (если реально потребуется)
+### 🚧 Этап D — удобства для больших отчётов
+
+* [ ] Фильтры/поиск: `section()->where(fn(Row $r) => ...)`
+* [ ] Индексация по `OperID` (лениво или при первом вызове)
+* [ ] Улучшение ошибок парсинга (контекст, позиция)
 
 ---
 
@@ -185,7 +239,6 @@ tests/
 ```bash
 composer require masyasmv/aton-statement-parser
 ```
-
 ---
 
 ## Development

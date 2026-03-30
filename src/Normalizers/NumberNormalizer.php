@@ -70,7 +70,15 @@ final class NumberNormalizer
             return true;
         }
 
+        if (strtolower($value) === 'true') {
+            return true;
+        }
+
         if ($value === '0') {
+            return false;
+        }
+
+        if (strtolower($value) === 'false') {
             return false;
         }
 

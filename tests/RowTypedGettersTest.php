@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RowTypedGettersTest extends TestCase
 {
-    public function test_row_typed_getters_work(): void
+    public function testRowTypedGettersWork(): void
     {
         $path = __DIR__ . '/Fixtures/typed-getters.xml';
 
@@ -45,7 +45,7 @@ final class RowTypedGettersTest extends TestCase
         $this->assertSame('1900-01-01 16:40:30', $timeSort->format('Y-m-d H:i:s'));
     }
 
-    public function test_defaults_are_returned_when_value_is_invalid(): void
+    public function testDefaultsAreReturnedWhenValueIsInvalid(): void
     {
         $path = __DIR__ . '/Fixtures/typed-getters.xml';
         $report = AtonStatementParser::fromFile($path);
@@ -57,7 +57,7 @@ final class RowTypedGettersTest extends TestCase
         $this->assertSame(true, $row->getBool('NoSuchKey', true));
     }
 
-    public function test_realistic_aton_dates_are_parsed_correctly(): void
+    public function testRealisticAtonDatesAreParsedCorrectly(): void
     {
         $path = __DIR__ . '/Fixtures/typed-getters-realistic.xml';
 
