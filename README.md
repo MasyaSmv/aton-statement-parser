@@ -1,19 +1,24 @@
 # aton-statement-parser
 
-Пакет для парсинга XML-отчётов брокера **Атон** (формат `BIS:BISPeriod`) в удобную структуру данных, чтобы в проекте можно было:
+Пакет для парсинга XML-отчётов брокера **Атон** в удобную доменную структуру данных. Сейчас библиотека ориентирована на поддержку:
+
+* старого BIS-формата `BIS:BISPeriod`,
+* нового XML-формата на основе `<root><source name="...">`.
+
+Цель та же: привести оба формата к единой модели отчёта, чтобы в проекте можно было:
 
 * передать путь до XML-файла,
-* получить объект отчёта (`Report`),
-* быстро выбрать нужный блок (`Trades`, `MoneyInOut`, `StockInOut`, …),
+* получить объект отчёта (`ReportInterface`),
+* быстро выбрать нужный блок (`Trades`, `MoneyInOut`, `StockInOut`, `TradesRegRepo`, `ClientMoneyConvert`, `StockPayingOff`, …),
 * найти операцию по `OperID`,
 * собрать список всех `OperID` (например, для сверки с БД),
 * работать с атрибутами строк через удобные геттеры (строки/даты/числа) без «магических» индексов массива.
 
-> Цель: минимальная боль при работе с реальными отчётами (namespaces, windows-1251, разные форматы дат, дробные числа).
+> Цель: минимальная боль при работе с реальными отчётами старого и нового форматов, сохраняя единый API.
 
 ---
 
-## Быстрый старт (планируемый API)
+## Быстрый старт
 
 ```php
 use MasyaSmv\AtonStatementParser\AtonStatementParser;
@@ -21,14 +26,14 @@ use MasyaSmv\AtonStatementParser\AtonStatementParser;
 $report = AtonStatementParser::fromFile('/path/to/report.xml');
 
 // Доступ к секциям (универсально)
-$trades = $report->section('Trades')->rows();      // Row[]
-$money  = $report->section('MoneyInOut')->rows();  // Row[]
+$trades = $report->section('Trades')->rows();      // RowCollection
+$money  = $report->section('MoneyInOut')->rows();  // RowCollection
 
 // Поиск по OperID
 $row = $report->findOperId('567890123');           // Row|null
 
 // Список всех OperID (для сверки)
-$ids = $report->operIds();                         // array<int|string>
+$ids = $report->operIds();                         // OperIdCollection
 
 // Удобные геттеры атрибутов
 $type = $report->section('Trades')->rows()[0]->getString('TradeType');
@@ -39,15 +44,19 @@ $date = $report->section('Trades')->rows()[0]->getDate('OperDateSort'); // DateT
 
 ## Проблемы, которые решает пакет
 
-### 1) Namespace BIS
+### 1) Два формата отчёта
+
+Старые отчёты используют `BIS:BISPeriod`, новые идут через `<root><source name="...">`. Библиотека должна уметь читать оба формата и сводить их к одной модели.
+
+### 2) Namespace BIS
 
 XML использует `xmlns:BIS=...`, значит нельзя просто «по имени тега» — нужен XPath с корректной регистрацией namespace.
 
-### 2) Кодировка windows-1251
+### 3) Кодировка windows-1251 и UTF-8 BOM
 
-В шапке отчёта встречается `encoding="windows-1251"`. Пакет должен безопасно перевести документ в UTF-8 перед парсингом.
+В старых отчётах встречается `encoding="windows-1251"`, а в новых возможен `utf-8` с BOM. Пакет должен безопасно привести документ к корректному виду перед парсингом.
 
-### 3) Разные форматы дат
+### 4) Разные форматы дат
 
 В отчётах встречаются:
 
@@ -58,7 +67,9 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 
 Нужен нормализатор даты: трим + поддержка `d.m.Y` и `d.m.y`.
 
-### 4) Десятичные числа
+В новом формате встречаются и ISO-значения, например `2024-02-01T00:00:00`.
+
+### 5) Десятичные числа
 
 Количество и суммы — строки с точностью (`100000.00000000`). Базовый слой хранит как string, а геттеры умеют приводить к float/int при необходимости.
 
@@ -70,7 +81,8 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 
 * **Report** — весь отчёт, доступ к секциям и общим данным.
 * **Section** — один блок внутри отчёта (например `Trades`, `MoneyInOut`).
-* **Row** — одна строка `<BIS:Row .../>` внутри секции. Хранит атрибуты + типовые геттеры.
+* **Row** — одна строка секции в каноническом виде. Хранит имя секции, исходный тип записи, immutable-атрибуты и типовые геттеры.
+* **RowCollection / OperIdCollection / AttributeBag** — immutable коллекции и value objects для публичной модели.
 
 ### Уровни удобства
 
@@ -84,10 +96,19 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 ```text
 src/
   AtonStatementParser.php          // fromFile/fromString
+  Collections/
+    RowCollection.php              // immutable коллекция строк
+    OperIdCollection.php           // immutable коллекция OperID
+  Parsing/
+    ReportParserResolver.php       // выбор парсера по формату документа
+    LegacyBisReportParser.php      // старый BIS-формат
+    ModernXmlReportParser.php      // новый root/source формат
+    SectionNameResolver.php        // канонизация имён секций
   Report/
-    Report.php                     // секции + commonData
-    Section.php                    // имя секции + Row[]
-    Row.php                        // атрибуты BIS:Row + геттеры
+    Report.php                     // секции отчёта
+    Section.php                    // имя секции + RowCollection
+    Row.php                        // строка секции + геттеры
+    AttributeBag.php               // immutable-атрибуты строки
   Xml/
     XmlLoader.php                  // чтение файла, encoding -> utf8, DOM
     XPathFactory.php               // DOMXPath + регистрация namespace
@@ -115,23 +136,27 @@ tests/
 * [x] Базовый каркас пакета (autoload, тесты)
 * [x] Fixtures подключены в тесты
 * [x] Скрипты composer для `test`, `cs:*`, `stan` (если настроено)
+* [x] Поддержка старого BIS-формата
+* [x] Базовая поддержка нового root/source формата
+* [x] Immutable collections в публичной модели
 
 ### 🚧 Этап A — «сразу полезно»
 
-* [ ] `AtonStatementParser::fromFile(string $path): Report`
-* [ ] `AtonStatementParser::fromString(string $xml): Report`
-* [ ] `Report->section(string $name): Section`
-* [ ] `Section->rows(): array<Row>`
-* [ ] `Report->operIds(): array` (собрать `OperID` по операционным секциям)
-* [ ] `Report->findOperId(string $id): ?Row`
-* [ ] Unit-тесты на fixtures (operIds/findOperId/section)
+* [x] `AtonStatementParser::fromFile(string $path): ReportInterface`
+* [x] `AtonStatementParser::fromString(string $xml): ReportInterface`
+* [x] `Report->section(string $name): Section`
+* [x] `Section->rows(): RowCollection`
+* [x] `Report->operIds(): OperIdCollection`
+* [x] `Report->findOperId(string $id): ?Row`
+* [x] Unit-тесты на fixtures (operIds/findOperId/section)
 
 ### 🚧 Этап B — нормализация типов
 
-* [ ] `Row->getString($key)` / `getInt($key)` / `getFloat($key)`
-* [ ] `Row->getDecimalString($key)` (без потери точности)
-* [ ] `Row->getDate($key): ?DateTimeImmutable` (с поддержкой форматов)
-* [ ] Тесты на даты/числа
+* [x] `Row->getString($key)` / `getInt($key)` / `getFloat($key)`
+* [x] `Row->getDecimalString($key)` (без потери точности)
+* [x] `Row->getDate($key): ?DateTimeImmutable` (с поддержкой форматов)
+* [x] Базовые тесты на даты/числа
+* [ ] Довести канонизацию полей между old/new форматами
 
 ### 🚧 Этап C — DTO (точечно, только нужное)
 

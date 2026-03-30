@@ -49,12 +49,17 @@ final class ModernXmlReportParser implements ReportParserInterface
 
                 $recordType = $recordElement->localName ?? '';
                 $sectionName = SectionNameResolver::resolveForNewFormat($sourceName, $recordType);
+                $fields = ModernFieldCanonicalizer::canonicalize(
+                    $sourceName,
+                    $recordType,
+                    $this->extractFields($recordElement)
+                );
 
                 $sectionRows[$sectionName][] = new Row(
                     $sectionName,
                     $sourceName,
                     $recordType,
-                    new AttributeBag($this->extractFields($recordElement))
+                    new AttributeBag($fields)
                 );
             }
         }
