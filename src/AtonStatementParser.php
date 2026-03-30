@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MasyaSmv\AtonStatementParser;
 
 use MasyaSmv\AtonStatementParser\Contracts\ReportInterface;
-use MasyaSmv\AtonStatementParser\Report\Report;
+use MasyaSmv\AtonStatementParser\Parsing\ReportParserResolver;
 use MasyaSmv\AtonStatementParser\Xml\XmlLoader;
-use MasyaSmv\AtonStatementParser\Xml\XPathFactory;
 
 final class AtonStatementParser
 {
@@ -27,9 +26,8 @@ final class AtonStatementParser
     public static function fromString(string $xml): ReportInterface
     {
         $dom = XmlLoader::loadXmlString($xml);
-        $xpath = XPathFactory::make($dom);
 
-        return Report::fromXPath($xpath);
+        return (new ReportParserResolver())->parse($dom);
     }
 
     public static function version(): string

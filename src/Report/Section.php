@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace MasyaSmv\AtonStatementParser\Report;
 
+use MasyaSmv\AtonStatementParser\Collections\RowCollection;
+
 final class Section
 {
-    /** @param Row[] $rows */
     public function __construct(
         private string $name,
-        private array $rows
+        private RowCollection $rows
     ) {
     }
 
@@ -18,8 +19,7 @@ final class Section
         return $this->name;
     }
 
-    /** @return Row[] */
-    public function rows(): array
+    public function rows(): RowCollection
     {
         return $this->rows;
     }

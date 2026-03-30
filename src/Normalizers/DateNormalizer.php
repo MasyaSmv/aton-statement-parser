@@ -39,6 +39,8 @@ final class DateNormalizer
             '!d.m.Y G:i',
             '!d.m.y H:i',
             '!d.m.y G:i',
+            '!Y-m-d\\TH:i:s',
+            '!Y-m-d',
         ];
 
         foreach ($formats as $format) {

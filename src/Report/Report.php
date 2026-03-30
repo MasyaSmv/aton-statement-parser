@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MasyaSmv\AtonStatementParser\Report;
 
-use DOMElement;
-use DOMXPath;
+use MasyaSmv\AtonStatementParser\Collections\OperIdCollection;
+use MasyaSmv\AtonStatementParser\Collections\RowCollection;
 use MasyaSmv\AtonStatementParser\Contracts\ReportInterface;
 use MasyaSmv\AtonStatementParser\Exceptions\ParseException;
 
@@ -18,62 +18,19 @@ final class Report implements ReportInterface
     {
     }
 
-    public static function fromXPath(DOMXPath $xpath): self
+    /**
+     * @param array<string, list<Row>> $rowsBySection
+     */
+    public static function fromRowsBySection(array $rowsBySection): self
     {
         $self = new self();
 
-        // Берём все дочерние секции внутри BIS:BISPeriod (кроме CommonData отдельно обработаем позже)
-        $periodNodes = $xpath->query('/BIS:BISPeriod');
-
-        if ($periodNodes === false || $periodNodes->length === 0) {
-            throw new ParseException('Root node BIS:BISPeriod not found.');
-        }
-
-        /** @var DOMElement $period */
-        $period = $periodNodes->item(0);
-        $rootNs = $period->namespaceURI; // может быть null в теории
-
-        // Каждая секция — это BIS:* элемент (BIS:Trades, BIS:MoneyInOut, …)
-        foreach ($period->childNodes as $child) {
-            if (!$child instanceof DOMElement) {
+        foreach ($rowsBySection as $sectionName => $rows) {
+            if ($rows === []) {
                 continue;
             }
 
-            $localName = $child->localName; // например CommonData, Trades, MoneyInOut
-
-            if ($localName === null || $localName === '') {
-                continue;
-            }
-
-            $ns = $child->namespaceURI ?? $rootNs;
-
-            if ($ns === null) {
-                // это уже странный документ: ожидаем BIS namespace
-                throw new ParseException('Namespace URI is missing for section: ' . $localName);
-            }
-
-            // Собираем строки BIS:Row внутри секции
-            $rows = [];
-
-            foreach ($child->getElementsByTagNameNS($ns, 'Row') as $rowEl) {
-                if (!$rowEl instanceof DOMElement) {
-                    continue;
-                }
-
-                $attrs = [];
-
-                foreach ($rowEl->attributes as $attr) {
-                    $key = $attr->localName ?? $attr->name;
-                    $attrs[$key] = $attr->value;
-                }
-
-                $rows[] = new Row($localName, $attrs);
-            }
-
-            // Если секция без Row — тоже сохраняем (иногда такие бывают), но пока можно пропустить.
-            if ($rows !== []) {
-                $self->sections[$localName] = new Section($localName, $rows);
-            }
+            $self->sections[$sectionName] = new Section($sectionName, new RowCollection($rows));
         }
 
         return $self;
@@ -93,12 +50,7 @@ final class Report implements ReportInterface
         return $this->sections[$name];
     }
 
-    /**
-     * Возвращает список всех OperID из всех секций, где он присутствует.
-     *
-     * @return array<int, string>
-     */
-    public function operIds(): array
+    public function operIds(): OperIdCollection
     {
         $ids = [];
 
@@ -112,8 +64,7 @@ final class Report implements ReportInterface
             }
         }
 
-        // Уникализируем, сохраняя порядок
-        return array_values(array_unique($ids));
+        return new OperIdCollection(array_values(array_unique($ids)));
     }
 
     public function findOperId(string $operId): ?Row

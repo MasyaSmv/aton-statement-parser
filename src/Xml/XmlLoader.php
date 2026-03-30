@@ -69,6 +69,8 @@ final class XmlLoader
      */
     private static function normalizeEncodingToUtf8(string $xml): string
     {
+        $xml = preg_replace('/^\xEF\xBB\xBF/', '', $xml) ?? $xml;
+
         // Если в шапке явно указано windows-1251, конвертируем.
         if (stripos($xml, 'encoding="windows-1251"') !== false || stripos($xml, "encoding='windows-1251'") !== false) {
             $xml = iconv('Windows-1251', 'UTF-8//IGNORE', $xml) ?: $xml;
