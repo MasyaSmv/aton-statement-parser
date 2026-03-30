@@ -100,7 +100,7 @@ final class MultiFormatParseTest extends TestCase
         $this->assertSame('1', $repoSettled->getString('isComplete'));
         $this->assertSame('25.12.2025 0:00:00', $repoSettled->getString('OperDateSort'));
         $this->assertSame('01.01.1900 14:55:03', $repoSettled->getString('OperTimeSort'));
-        $this->assertSame('', $repoSettled->getString('RepoMarginCall'));
+        $this->assertSame('24', $repoSettled->getString('RepoMarginCall'));
 
         $repoNotSettled = $report->section('TradesNonRegRepo')->rows()->first();
         $this->assertNotNull($repoNotSettled);
@@ -134,8 +134,8 @@ final class MultiFormatParseTest extends TestCase
         $this->assertNotNull($clientMoneyConvert);
         $this->assertSame('TradeFXClient', $clientMoneyConvert->sourceName());
         $this->assertSame('ClientMoneyConvert', $clientMoneyConvert->getString('Section'));
-        $this->assertSame('19.03.2021', $clientMoneyConvert->getString('OperDate'));
-        $this->assertSame('19.03.2021 0:00:00', $clientMoneyConvert->getString('OperDateSort'));
+        $this->assertSame('22.03.2021', $clientMoneyConvert->getString('OperDate'));
+        $this->assertSame('22.03.2021 0:00:00', $clientMoneyConvert->getString('OperDateSort'));
         $this->assertSame('22252.50000000', $clientMoneyConvert->getDecimalString('Sum1'));
         $this->assertSame('22252.50000000', $clientMoneyConvert->getDecimalString('Sum1_RUR'));
 
