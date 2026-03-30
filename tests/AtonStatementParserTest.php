@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class AtonStatementParserTest extends TestCase
 {
-    public function test_version_returns_string(): void
+    public function testVersionReturnsString(): void
     {
         $version = AtonStatementParser::version();
 

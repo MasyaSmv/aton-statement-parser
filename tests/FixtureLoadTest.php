@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FixtureLoadTest extends TestCase
 {
-    public function test_can_read_fixture_file(): void
+    public function testCanReadFixtureFile(): void
     {
         $path = __DIR__ . '/Fixtures/sample.xml';
 
