@@ -16,7 +16,7 @@ final class RowTypedGettersTest extends TestCase
 
         $report = AtonStatementParser::fromFile($path);
 
-        $tradeRow = $report->section('Trades')->rows()[0];
+        $tradeRow = $report->section('Trades')->rows()->get(0);
 
         $this->assertSame('Покупка', $tradeRow->getString('TradeType'));
         $this->assertSame(567890123, $tradeRow->getInt('OperID'));
@@ -33,7 +33,7 @@ final class RowTypedGettersTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $dateSort);
         $this->assertSame('2024-12-25 00:00:00', $dateSort->format('Y-m-d H:i:s'));
 
-        $moneyRow = $report->section('MoneyInOut')->rows()[0];
+        $moneyRow = $report->section('MoneyInOut')->rows()->get(0);
         $this->assertSame(456789012, $moneyRow->getInt('OperID'));
 
         $date2 = $moneyRow->getDate('OperDate');
@@ -50,7 +50,7 @@ final class RowTypedGettersTest extends TestCase
         $path = __DIR__ . '/Fixtures/typed-getters.xml';
         $report = AtonStatementParser::fromFile($path);
 
-        $row = $report->section('Trades')->rows()[0];
+        $row = $report->section('Trades')->rows()->get(0);
 
         $this->assertSame(123, $row->getInt('NoSuchKey', 123));
         $this->assertSame('0.0', $row->getDecimalString('NoSuchKey', '0.0'));
@@ -64,7 +64,7 @@ final class RowTypedGettersTest extends TestCase
         $report = AtonStatementParser::fromFile($path);
 
         // Trades: OperDateSort = date at midnight
-        $tradeRow = $report->section('Trades')->rows()[0];
+        $tradeRow = $report->section('Trades')->rows()->get(0);
 
         $dateSort = $tradeRow->getDate('OperDateSort');
         $this->assertInstanceOf(DateTimeImmutable::class, $dateSort);
@@ -81,7 +81,7 @@ final class RowTypedGettersTest extends TestCase
         $this->assertSame('2024-12-26 00:00:00', $paymentDate->format('Y-m-d H:i:s'));
 
         // MoneyInOut: 2-digit year should become 2018
-        $moneyRow = $report->section('MoneyInOut')->rows()[0];
+        $moneyRow = $report->section('MoneyInOut')->rows()->get(0);
 
         $operDate = $moneyRow->getDate('OperDate');
         $this->assertInstanceOf(DateTimeImmutable::class, $operDate);

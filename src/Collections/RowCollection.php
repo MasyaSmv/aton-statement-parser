@@ -15,7 +15,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, Row>
- * @implements ArrayAccess<mixed, Row>
+ * @implements ArrayAccess<int, Row>
  */
 final class RowCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -63,11 +63,13 @@ final class RowCollection implements IteratorAggregate, Countable, ArrayAccess
         return new ArrayIterator($this->items);
     }
 
+    /** @psalm-suppress RedundantConditionGivenDocblockType */
     public function offsetExists(mixed $offset): bool
     {
         return is_int($offset) && array_key_exists($offset, $this->items);
     }
 
+    /** @psalm-suppress DocblockTypeContradiction */
     public function offsetGet(mixed $offset): Row
     {
         if (!is_int($offset)) {

@@ -15,7 +15,7 @@ use Traversable;
 
 /**
  * @implements IteratorAggregate<int, StockBalance>
- * @implements ArrayAccess<mixed, StockBalance>
+ * @implements ArrayAccess<int, StockBalance>
  */
 final class StockBalanceCollection implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -58,11 +58,13 @@ final class StockBalanceCollection implements IteratorAggregate, Countable, Arra
         return new ArrayIterator($this->items);
     }
 
+    /** @psalm-suppress RedundantConditionGivenDocblockType */
     public function offsetExists(mixed $offset): bool
     {
         return is_int($offset) && array_key_exists($offset, $this->items);
     }
 
+    /** @psalm-suppress DocblockTypeContradiction */
     public function offsetGet(mixed $offset): StockBalance
     {
         if (!is_int($offset)) {

@@ -37,7 +37,8 @@ final class LegacyBisReportParser implements ReportParserInterface
                 continue;
             }
 
-            $sectionName = $this->normalizeLocalName($child->localName);
+            /** @var string $sectionName */
+            $sectionName = $child->localName;
 
             if ($sectionName === '') {
                 continue;
@@ -93,15 +94,11 @@ final class LegacyBisReportParser implements ReportParserInterface
                 continue;
             }
 
-            $key = $this->normalizeLocalName($attribute->localName);
+            /** @var string $key */
+            $key = $attribute->localName;
             $attributes[$key] = $attribute->value;
         }
 
         return $attributes;
-    }
-
-    private function normalizeLocalName(?string $localName): string
-    {
-        return $localName ?? '';
     }
 }
