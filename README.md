@@ -29,6 +29,18 @@ $report = AtonStatementParser::fromFile('/path/to/report.xml');
 $trades = $report->section('Trades')->rows();      // RowCollection
 $money  = $report->section('MoneyInOut')->rows();  // RowCollection
 
+// DTO-уровень для типовых сценариев
+$commonData = $report->commonData();               // ?CommonData
+$tradeDtos  = $report->trades();                   // TradeCollection
+$moneyDtos  = $report->moneyInOut();               // MoneyOperationCollection
+$moneyState = $report->moneyOnDate();              // MoneyBalanceCollection
+$stockState = $report->stockOnDate();              // StockBalanceCollection
+$fxDtos     = $report->moneyConvert();             // MoneyConvertCollection
+$stockDtos  = $report->stockInOut();               // StockTransferCollection
+$payoffDtos = $report->stockPayingOff();           // StockPayingOffCollection
+$corpInDtos = $report->corporateActionsIn();       // CorporateActionCollection
+$corpOutDtos = $report->corporateActionsOut();     // CorporateActionCollection
+
 // Поиск по OperID
 $row = $report->findOperId('567890123');           // Row|null
 
@@ -87,7 +99,8 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 ### Уровни удобства
 
 1. **Базовый (универсальный)**: `Report/Section/Row` — работает для любых секций без генерации десятков DTO.
-2. **Продвинутый (DTO для популярных секций)**: `TradeDto`, `MoneyInOutDto` и т.п. — добавляются постепенно, когда станет понятно, что реально часто используется.
+2. **Продвинутый (DTO для популярных секций)**: `CommonData`, `Trade`, `MoneyOperation` и т.п. — добавляются постепенно поверх канонической модели.
+   На текущем этапе доступны также DTO для `MoneyOnDate`, `StockOnDate*`, `MoneyConvert`, `StockInOut`, `StockPayingOff`, `CorpActionIn`, `CorpActionOut`.
 
 ---
 
@@ -97,8 +110,39 @@ XML использует `xmlns:BIS=...`, значит нельзя просто
 src/
   AtonStatementParser.php          // fromFile/fromString
   Collections/
+    CorporateActionCollection.php   // immutable коллекция корпоративных действий
+    MoneyBalanceCollection.php      // immutable коллекция денежных остатков
+    MoneyConvertCollection.php      // immutable коллекция конверсионных операций
+    MoneyOperationCollection.php    // immutable коллекция денежных операций
     RowCollection.php              // immutable коллекция строк
     OperIdCollection.php           // immutable коллекция OperID
+    StockBalanceCollection.php     // immutable коллекция остатков по бумагам
+    StockPayingOffCollection.php   // immutable коллекция погашений/выплат
+    StockTransferCollection.php    // immutable коллекция переводов бумаг
+    TradeCollection.php            // immutable коллекция сделок
+  Contracts/
+    Mappers/
+      ...MapperInterface.php       // интерфейсы DTO-мапперов
+  Dto/
+    CommonData.php                 // DTO общих данных отчёта
+    CorporateAction.php            // DTO корпоративного действия
+    MoneyBalance.php               // DTO денежного остатка
+    MoneyConvertOperation.php      // DTO валютной конверсии
+    Trade.php                      // DTO сделки
+    MoneyOperation.php             // DTO денежной операции
+    StockBalance.php               // DTO остатка по бумаге
+    StockPayingOff.php             // DTO погашения/выплаты по бумаге
+    StockTransfer.php              // DTO перевода/списания бумаги
+  Mappers/
+    CommonDataMapper.php           // Row -> CommonData
+    CorporateActionMapper.php      // Row -> CorporateAction
+    MoneyBalanceMapper.php         // Row -> MoneyBalance
+    MoneyConvertMapper.php         // Row -> MoneyConvertOperation
+    TradeMapper.php                // Row -> Trade
+    MoneyOperationMapper.php       // Row -> MoneyOperation
+    StockBalanceMapper.php         // Row -> StockBalance
+    StockPayingOffMapper.php       // Row -> StockPayingOff
+    StockTransferMapper.php        // Row -> StockTransfer
   Parsing/
     ReportParserResolver.php       // выбор парсера по формату документа
     LegacyBisReportParser.php      // старый BIS-формат
@@ -160,10 +204,18 @@ tests/
 
 ### 🚧 Этап C — DTO (точечно, только нужное)
 
-* [ ] `Report->trades(): array<TradeDto>`
-* [ ] `Report->moneyInOut(): array<MoneyInOutDto>`
-* [ ] Мапперы секций → DTO
-* [ ] Тесты DTO-маппинга
+* [x] `Report->trades(): TradeCollection`
+* [x] `Report->moneyInOut(): MoneyOperationCollection`
+* [x] `Report->moneyOnDate(): MoneyBalanceCollection`
+* [x] `Report->stockOnDate(): StockBalanceCollection`
+* [x] `Report->moneyConvert(): MoneyConvertCollection`
+* [x] `Report->stockInOut(): StockTransferCollection`
+* [x] `Report->stockPayingOff(): StockPayingOffCollection`
+* [x] `Report->corporateActionsIn(): CorporateActionCollection`
+* [x] `Report->corporateActionsOut(): CorporateActionCollection`
+* [x] Базовые мапперы секций → DTO
+* [x] Расширить DTO-покрытие на дополнительные секции
+* [x] Довести базовые тесты DTO-маппинга
 
 ### 🚧 Этап D — удобства для больших отчётов
 

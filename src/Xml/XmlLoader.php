@@ -44,7 +44,7 @@ final class XmlLoader
         $prev = libxml_use_internal_errors(true);
         libxml_clear_errors();
 
-        $ok = $dom->loadXML($xml, LIBXML_NONET | LIBXML_COMPACT);
+        $ok = $dom->loadXML($xml, LIBXML_NONET | LIBXML_COMPACT | LIBXML_PARSEHUGE);
 
         $errors = libxml_get_errors();
         libxml_clear_errors();
