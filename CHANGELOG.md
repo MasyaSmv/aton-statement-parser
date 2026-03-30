@@ -13,6 +13,7 @@ The format is based on Keep a Changelog and the project follows Semantic Version
 - Deptrac architecture analysis and dedicated deptrac configuration.
 - Infection mutation testing setup and scheduled mutation workflow.
 - Coverage threshold check based on Clover XML report.
+- Dedicated coverage-focused tests for immutable collections, parser units, DTO accessors and edge-case normalization branches.
 
 ### Changed
 
@@ -20,6 +21,8 @@ The format is based on Keep a Changelog and the project follows Semantic Version
 - Aligned parser, XML loader, collections and tests with stricter static analysis rules.
 - Added project cache directory ignore rules for local tooling output.
 - Shifted documentation and typed-getter examples toward explicit collection access via `get()`.
+- Removed unreachable parser guard branches around DOM internals instead of preserving dead code for tooling.
+- Reached `100%` local coverage for lines, methods and classes.
 
 ## [0.1.0] - 2026-03-30
 

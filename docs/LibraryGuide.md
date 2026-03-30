@@ -254,6 +254,12 @@ Mutation testing поддерживается отдельно:
 - mutation testing вынесен в отдельный workflow, потому что он ощутимо тяжелее обычного CI;
 - локально `infection` и coverage-команды требуют coverage driver (`pcov` или `xdebug`).
 
+Текущее подтверждённое локальное покрытие:
+
+- строки: `100%`
+- методы: `100%`
+- классы: `100%`
+
 ## CI и mutation testing
 
 Основной workflow:

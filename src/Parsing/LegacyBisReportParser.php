@@ -39,22 +39,10 @@ final class LegacyBisReportParser implements ReportParserInterface
 
             /** @var string $sectionName */
             $sectionName = $child->localName;
-
-            if ($sectionName === '') {
-                continue;
-            }
-
-            $namespace = $child->namespaceURI ?? $period->namespaceURI;
-
-            if ($namespace === null || $namespace === '') {
-                throw new ParseException('Namespace URI is missing for section: ' . $sectionName);
-            }
+            /** @var string $namespace */
+            $namespace = $period->namespaceURI;
 
             foreach ($child->getElementsByTagNameNS($namespace, 'Row') as $rowElement) {
-                if (!$rowElement instanceof DOMElement) {
-                    continue;
-                }
-
                 $sectionRows[$sectionName][] = new Row(
                     $sectionName,
                     $sectionName,
@@ -75,11 +63,8 @@ final class LegacyBisReportParser implements ReportParserInterface
             throw new ParseException('Root node BIS:BISPeriod not found.');
         }
 
+        /** @var DOMElement $period */
         $period = $periodNodes->item(0);
-
-        if (!$period instanceof DOMElement) {
-            throw new ParseException('Root BIS:BISPeriod is not a valid element.');
-        }
 
         return $period;
     }
@@ -90,10 +75,7 @@ final class LegacyBisReportParser implements ReportParserInterface
         $attributes = [];
 
         foreach ($rowElement->attributes as $attribute) {
-            if (!$attribute instanceof DOMAttr) {
-                continue;
-            }
-
+            /** @var DOMAttr $attribute */
             /** @var string $key */
             $key = $attribute->localName;
             $attributes[$key] = $attribute->value;

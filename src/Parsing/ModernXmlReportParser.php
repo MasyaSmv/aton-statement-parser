@@ -23,11 +23,8 @@ final class ModernXmlReportParser implements ReportParserInterface
 
     public function parse(DOMDocument $document): Report
     {
+        /** @var DOMElement $root */
         $root = $document->documentElement;
-
-        if (!$root instanceof DOMElement) {
-            throw new ParseException('Root element not found for modern XML report.');
-        }
 
         /** @var array<string, list<Row>> $sectionRows */
         $sectionRows = [];
@@ -81,11 +78,6 @@ final class ModernXmlReportParser implements ReportParserInterface
 
             /** @var string $fieldName */
             $fieldName = $fieldElement->localName;
-
-            if ($fieldName === '') {
-                continue;
-            }
-
             $fields[$fieldName] = trim($fieldElement->textContent);
         }
 

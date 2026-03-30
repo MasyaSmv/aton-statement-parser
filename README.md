@@ -200,6 +200,7 @@ tests/
 * [x] `Row->getDecimalString($key)` (без потери точности)
 * [x] `Row->getDate($key): ?DateTimeImmutable` (с поддержкой форматов)
 * [x] Базовые тесты на даты/числа
+* [x] Фактический coverage доведён до `100%` по строкам/методам/классам
 * [ ] Довести канонизацию полей между old/new форматами
 
 ### 🚧 Этап C — DTO (точечно, только нужное)
@@ -263,6 +264,12 @@ composer infection
 
 Локально `composer infection` и `composer test:coverage` требуют coverage driver (`pcov` или `xdebug`).
 В CI они запускаются через `setup-php` с `pcov`.
+
+Текущее состояние локального test coverage:
+
+* строки: `100%`
+* методы: `100%`
+* классы: `100%`
 
 ## Documentation
 
