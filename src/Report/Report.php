@@ -41,6 +41,8 @@ final class Report implements ReportInterface
     /** @var array<string, Section> */
     private array $sections = [];
 
+    private DiagnosticCollection $diagnostics;
+
     private CommonDataMapperInterface $commonDataMapper;
 
     private TradeMapperInterface $tradeMapper;
@@ -68,7 +70,8 @@ final class Report implements ReportInterface
         ?StockBalanceMapperInterface $stockBalanceMapper = null,
         ?StockTransferMapperInterface $stockTransferMapper = null,
         ?StockPayingOffMapperInterface $stockPayingOffMapper = null,
-        ?CorporateActionMapperInterface $corporateActionMapper = null
+        ?CorporateActionMapperInterface $corporateActionMapper = null,
+        ?DiagnosticCollection $diagnostics = null
     ) {
         $this->commonDataMapper = $commonDataMapper ?? new CommonDataMapper();
         $this->tradeMapper = $tradeMapper ?? new TradeMapper();
@@ -79,14 +82,15 @@ final class Report implements ReportInterface
         $this->stockTransferMapper = $stockTransferMapper ?? new StockTransferMapper();
         $this->stockPayingOffMapper = $stockPayingOffMapper ?? new StockPayingOffMapper();
         $this->corporateActionMapper = $corporateActionMapper ?? new CorporateActionMapper();
+        $this->diagnostics = $diagnostics ?? new DiagnosticCollection([]);
     }
 
     /**
      * @param array<string, list<Row>> $rowsBySection
      */
-    public static function fromRowsBySection(array $rowsBySection): self
+    public static function fromRowsBySection(array $rowsBySection, ?DiagnosticCollection $diagnostics = null): self
     {
-        $self = new self();
+        $self = new self(diagnostics: $diagnostics);
 
         foreach ($rowsBySection as $sectionName => $rows) {
             if ($rows === []) {
@@ -97,6 +101,16 @@ final class Report implements ReportInterface
         }
 
         return $self;
+    }
+
+    public function diagnostics(): DiagnosticCollection
+    {
+        return $this->diagnostics;
+    }
+
+    public function hasDiagnostics(): bool
+    {
+        return !$this->diagnostics->isEmpty();
     }
 
     public function hasSection(string $name): bool
